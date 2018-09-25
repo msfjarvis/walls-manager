@@ -3,26 +3,33 @@ import argparse
 import configparser
 
 from stats import parse_and_display_stats
-from sync import sync_to_remote
+from sync import sync_to_remote, sync_to_local
 
 config = configparser.ConfigParser()
 config.read("config.ini")
-rsync_dirs = config["DEST"]["RSYNC_DIRS"]
-source = config["SOURCE"]["DIR"]
+remote_dirs = config["DEST"]["RSYNC_DIRS"]
+local_dir = config["SOURCE"]["DIR"]
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--sync", help="Sync local directory to remote destination",
-                        action="store_true")
+                        type=str, default="remote")
     parser.add_argument("-d", "--details", help="List statistics of local directory",
                         action="store_true")
     args = parser.parse_args()
 
-    if args.sync:
-        sync_to_remote(rsync_dirs, source)
+    if args.sync and args.sync == "remote":
+        sync_to_remote(remote_dirs, local_dir)
+    elif args.sync and args.sync == "local":
+        # The adjustments below are required to replicate the sync_to_remote
+        # semantics when we do this reverse sync.
+        # We choose the first in the remote_dirs to be our primary and reliable
+        # mirror, then append a trailing slash, and remove the same slash
+        # from the local directory. Gotta love rsync.
+        sync_to_local(remote_dirs.split(",")[0] + '/', local_dir[0:-1])
     elif args.details:
-        parse_and_display_stats(source)
+        parse_and_display_stats(local_dir)
 
 
 if __name__ == '__main__':
