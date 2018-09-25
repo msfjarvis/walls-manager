@@ -1,3 +1,3 @@
 # walls-manager
 
-Tooling I use to maintain and monitor the stuff at download.msfjarvis.website/.walls
+Tooling used to maintain my public collection of desktop walls
