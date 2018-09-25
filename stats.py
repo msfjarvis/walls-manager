@@ -22,4 +22,5 @@ def parse_and_display_stats(directory='.'):
 
 
 if __name__ == '__main__':
-    parse_and_display_stats()
+    print("This script is not intended to be used by itself, use manager.py!")
+    exit(1)

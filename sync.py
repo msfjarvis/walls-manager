@@ -22,4 +22,5 @@ def sync_to_remote(rsync_dirs, source):
 
 
 if __name__ == '__main__':
-    sync_to_remote()
+    print("This script is not intended to be used by itself, use manager.py!")
+    exit(1)
