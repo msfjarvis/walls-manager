@@ -1,0 +1,6 @@
+[SOURCE]
+    DIR=/path/to/your/local/folder/with/trailing/slash/
+
+# RSYNC_DIRS can be a comma separated list as well if you intend to only maintain one mirror
+[DEST]
+    RSYNC_DIRS=user@host:/path/to/remote/dir/without/trailing/slash
