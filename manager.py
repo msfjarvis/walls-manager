@@ -13,10 +13,8 @@ local_dir = config["SOURCE"]["DIR"]
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--sync", help="Sync local directory to remote destination",
-                        type=str, default="remote")
-    parser.add_argument("-d", "--details", help="List statistics of local directory",
-                        action="store_true")
+    parser.add_argument("-s", "--sync", help="Sync local directory to remote destination", type=str)
+    parser.add_argument("-d", "--details", help="List statistics of local directory", action="store_true")
     args = parser.parse_args()
 
     if args.sync and args.sync == "remote":
@@ -30,6 +28,8 @@ def main():
         sync_to_local(remote_dirs.split(",")[0] + '/', local_dir[0:-1])
     elif args.details:
         parse_and_display_stats(local_dir)
+    else:
+        parser.print_help()
 
 
 if __name__ == '__main__':
