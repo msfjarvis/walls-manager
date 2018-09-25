@@ -1,15 +1,9 @@
-import configparser
 import subprocess
 
-config = configparser.ConfigParser()
-config.read("config.ini")
 
-
-def sync_to_remote():
-    rsync_dirs = config["DEST"]["RSYNC_DIRS"]
-    source = config["SOURCE"]["DIR"]
+def sync_to_remote(rsync_dirs, source):
     for item in rsync_dirs.split(","):
-        rsynccmd = "rsync -av --progress {} {}".format(source, item)
+        rsynccmd = "rsync -av --progress --delete {} {}".format(source, item)
         rsyncproc = subprocess.Popen(rsynccmd,
                                      shell=True,
                                      stdin=subprocess.PIPE,
