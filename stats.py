@@ -4,6 +4,8 @@ picture_stats = {}
 
 
 def walk_dir(directory='.', extension='jpg'):
+    global total_count
+    total_count = 0
     extension = extension.lower()
     for dirpath, dirnames, files in os.walk(directory):
         for name in files:
@@ -12,6 +14,7 @@ def walk_dir(directory='.', extension='jpg'):
                 count = sanitized_name.split("_")[-1]
                 model_name = sanitized_name.replace("_{}".format(count), "")
                 picture_stats[model_name] = picture_stats.get(model_name, 0) + 1
+                total_count += 1
 
 
 def parse_and_display_stats(directory='.'):
@@ -19,6 +22,7 @@ def parse_and_display_stats(directory='.'):
     print("Directory analysis for {}\n".format(directory))
     for key, value in sorted(picture_stats.items()):
         print("{}: {}".format(key.replace("_", " "), value))
+    print("\nTotal: {}".format(total_count))
 
 
 if __name__ == '__main__':
