@@ -25,7 +25,6 @@ def sync_to_remote(remote_dirs, local_dir):
 
         if exitcode == 0:
             printed_stats = True
-            print("Success!")
 
 
 def sync_to_local(remote_dir, local_dir):
@@ -44,10 +43,7 @@ def sync_to_local(remote_dir, local_dir):
         elif next_line.find("*deleting") != -1:
             print("Deleting: {}".format(next_line.split()[1]))
 
-    exitcode = rsyncproc.wait()
-
-    if exitcode == 0:
-        print("Success!")
+    rsyncproc.wait()
 
 
 if __name__ == '__main__':
