@@ -2,6 +2,7 @@ import subprocess
 
 
 def sync_to_remote(remote_dirs, local_dir):
+    printed_stats = False
     for item in remote_dirs.split(","):
         rsynccmd = "rsync -av --progress --delete --itemize-changes {} {}".format(local_dir, item)
         rsyncproc = subprocess.Popen(rsynccmd,
@@ -10,6 +11,8 @@ def sync_to_remote(remote_dirs, local_dir):
                                      stdout=subprocess.PIPE)
 
         while True:
+            if printed_stats:
+                break
             next_line = rsyncproc.stdout.readline().decode("utf-8")
             if not next_line:
                 break
@@ -21,6 +24,7 @@ def sync_to_remote(remote_dirs, local_dir):
         exitcode = rsyncproc.wait()
 
         if exitcode == 0:
+            printed_stats = True
             print("Success!")
 
 
