@@ -17,9 +17,9 @@ def sync_to_remote(remote_dirs, local_dir):
             if not next_line:
                 break
             elif next_line.find("<f+++++++++") != -1:
-                print("New wallpaper: {}".format(next_line.split()[1]))
+                print("New wallpaper: {}".format(next_line.split()[1].replace("_", " ").replace(".jpg", "")))
             elif next_line.find("*deleting") != -1:
-                print("Deleting: {}".format(next_line.split()[1]))
+                print("Deleting: {}".format(next_line.split()[1].replace("_", " ").replace(".jpg", "")))
 
         exitcode = rsyncproc.wait()
 
@@ -39,9 +39,9 @@ def sync_to_local(remote_dir, local_dir):
         if not next_line:
             break
         elif next_line.find("<f+++++++++") != -1:
-            print("New wallpaper: {}".format(next_line.split()[1]))
+            print("New wallpaper: {}".format(next_line.split()[1].replace("_", " ").replace(".jpg", "")))
         elif next_line.find("*deleting") != -1:
-            print("Deleting: {}".format(next_line.split()[1]))
+            print("Deleting: {}".format(next_line.split()[1].replace("_", " ").replace(".jpg", "")))
 
     rsyncproc.wait()
 
