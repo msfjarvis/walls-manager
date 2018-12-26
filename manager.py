@@ -13,7 +13,7 @@ local_dir = config["SOURCE"]["DIR"]
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--sync", help="Sync local directory to remote destination", type=str)
+    parser.add_argument("-s", "--sync", help="Set direction of sync, local for pull and remote for push", type=str)
     parser.add_argument("-d", "--details", help="List statistics of local directory", action="store_true")
     args = parser.parse_args()
 
