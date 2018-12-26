@@ -40,11 +40,11 @@ def sync_to_local(remote_dir, local_dir):
         next_line = rsyncproc.stdout.readline().decode("utf-8")
         if not next_line:
             break
-        elif next_line.find("<f+++++++++") != -1:
+        elif next_line.find(">f+++++++++") != -1:
             print("New wallpaper: {}".format(extract_pretty_name(next_line)))
         elif next_line.find("*deleting") != -1:
             print("Deleting: {}".format(extract_pretty_name(next_line)))
-        elif next_line.find("<f.st......") != -1:
+        elif next_line.find(">f.st......") != -1:
             print("Updating: {}".format(extract_pretty_name(next_line)))
 
     rsyncproc.wait()
