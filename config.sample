@@ -4,3 +4,4 @@
 # RSYNC_DIRS can be a comma separated list as well if you intend to maintain more than one mirror
 [DEST]
     RSYNC_DIRS=user@host:/path/to/remote/dir/without/trailing/slash
+    PUBLIC_URL=https://domain.tld/folder/

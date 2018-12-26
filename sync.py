@@ -1,7 +1,7 @@
 import subprocess
 
 
-def sync_to_remote(remote_dirs, local_dir):
+def sync_to_remote(remote_dirs, local_dir, markdown_output, remote_url):
     printed_stats = False
     for item in remote_dirs.split(","):
         rsynccmd = "rsync -av --progress --delete --itemize-changes {} {}".format(local_dir, item)
@@ -10,6 +10,9 @@ def sync_to_remote(remote_dirs, local_dir):
                                      stdin=subprocess.PIPE,
                                      stdout=subprocess.PIPE)
 
+        if not remote_url:
+            markdown_output = False
+
         while True:
             if printed_stats:
                 break
@@ -17,11 +20,15 @@ def sync_to_remote(remote_dirs, local_dir):
             if not next_line:
                 break
             elif next_line.find("<f+++++++++") != -1:
-                print("New wallpaper: {}".format(extract_pretty_name(next_line)))
+                print("New wallpaper: {}".format(print_names(remote_url,
+                                                             extract_pretty_name(next_line),
+                                                             markdown_output)))
             elif next_line.find("*deleting") != -1:
                 print("Deleting: {}".format(extract_pretty_name(next_line)))
             elif next_line.find("<f.st......") != -1:
-                print("Updating: {}".format(extract_pretty_name(next_line)))
+                print("Updating: {}".format(print_names(remote_url,
+                                                        extract_pretty_name(next_line),
+                                                        markdown_output)))
 
         exitcode = rsyncproc.wait()
 
@@ -48,6 +55,13 @@ def sync_to_local(remote_dir, local_dir):
             print("Updating: {}".format(extract_pretty_name(next_line)))
 
     rsyncproc.wait()
+
+
+def print_names(base_url, file_name, is_markdown):
+    if is_markdown:
+        return "[{}]({})".format(file_name, base_url + (file_name.replace(" ", "_")) + ".jpg")
+    else:
+        return file_name
 
 
 def extract_pretty_name(rsync_output_line):
