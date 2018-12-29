@@ -42,7 +42,8 @@ def parse_and_display_stats(directory='.'):
     print("Directory analysis for {}\n".format(directory))
     for key, value in sorted(picture_stats.items()):
         print("{}: {}".format(key.replace("_", " "), value))
-    print("\nTotal count: {}".format(total_count))
+    print("\nTotal images: {}".format(total_count))
+    print("Total models: {}".format(len(picture_stats)))
     print("Total size: {}".format(calc_size(directory)))
 
 
