@@ -1,3 +1,5 @@
+#pylint: disable=missing-docstring
+
 import subprocess
 
 
@@ -60,8 +62,7 @@ def sync_to_local(remote_dir, local_dir):
 def print_names(base_url, file_name, is_markdown):
     if is_markdown:
         return "[{}]({})".format(file_name, base_url + (file_name.replace(" ", "_")) + ".jpg")
-    else:
-        return file_name
+    return file_name
 
 
 def extract_pretty_name(rsync_output_line):
