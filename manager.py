@@ -7,11 +7,11 @@ import configparser
 from stats import parse_and_display_stats
 from sync import sync_to_remote, sync_to_local
 
-CONFIG = configparser.ConfigParser()
-CONFIG.read("config.ini")
-REMOTE_DIRS = CONFIG["DEST"]["RSYNC_DIRS"]
-REMOTE_URL = CONFIG["DEST"]["PUBLIC_URL"]
-LOCAL_DIR = CONFIG["SOURCE"]["DIR"]
+config = configparser.ConfigParser()  # pylint: disable=invalid-name
+config.read("config.ini")
+REMOTE_DIRS = config["DEST"]["RSYNC_DIRS"]
+REMOTE_URL = config["DEST"]["PUBLIC_URL"]
+LOCAL_DIR = config["SOURCE"]["DIR"]
 
 
 def main():
