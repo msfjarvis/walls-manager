@@ -1,5 +1,6 @@
 import logging
 import configparser
+from random import randint
 
 from telegram.ext import Updater, CommandHandler
 from search import search_files
@@ -26,6 +27,15 @@ def search(bot, update, args):
 
         bot.send_message(update.message.chat_id, message, "Markdown", disable_web_page_preview=True)
 
+def get(bot, update, args):
+    pretty_name, found_files = find_files(args)
+    if not found_files:
+        update.message.reply_text("No files found for search term '{}'".format(pretty_name))
+    else:
+        selected_name = found_files[randint(0, len(found_files) - 1)]
+        selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
+        bot.send_photo(update.message.chat_id, open(selected_file_path, 'rb'))
+
 def find_files(args):
     name = "_".join(args)
     pretty_name = " ".join(args)
@@ -36,6 +46,7 @@ def main():
     updater = Updater(TOKEN)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("search", search, pass_args=True))
+    dp.add_handler(CommandHandler("get", get, pass_args=True))
     updater.start_polling()
     updater.idle()
 
