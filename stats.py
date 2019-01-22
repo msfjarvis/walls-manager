@@ -1,7 +1,7 @@
-#pylint: disable=missing-docstring
+# pylint: disable=missing-docstring
 
-import os
 import math
+import os
 
 PICTURE_STATS = {}
 

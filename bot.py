@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # pylint: disable=missing-docstring
 
-import logging
 import configparser
+import logging
 
 from telegram.ext import Updater, CommandHandler
+
 from search import search_files
 
 config = configparser.ConfigParser()  # pylint: disable=invalid-name
