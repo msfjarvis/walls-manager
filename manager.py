@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#pylint: disable=missing-docstring
+# pylint: disable=missing-docstring
 
 import argparse
 import configparser
