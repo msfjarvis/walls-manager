@@ -16,9 +16,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 
 def search(bot, update, args):
-    name = "_".join(args)
-    pretty_name = " ".join(args)
-    found_files = search_files(name, LOCAL_DIR)
+    pretty_name, found_files = find_files(args)
     if not found_files:
         update.message.reply_text("No files found for search term '{}'".format(pretty_name))
     else:
@@ -28,6 +26,11 @@ def search(bot, update, args):
 
         bot.send_message(update.message.chat_id, message, "Markdown", disable_web_page_preview=True)
 
+def find_files(args):
+    name = "_".join(args)
+    pretty_name = " ".join(args)
+    found_files = search_files(name, LOCAL_DIR)
+    return pretty_name, found_files
 
 def main():
     updater = Updater(TOKEN)
