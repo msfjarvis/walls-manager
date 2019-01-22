@@ -9,10 +9,12 @@ Tooling used to maintain my public collection of desktop walls
 
 ```
 $ ./manager.py -h
-usage: manager.py [-h] [-s] [-d]
+usage: manager.py [-h] [-d] [-m] [-s SYNC]
 
 optional arguments:
-  -h, --help     show this help message and exit
-  -s, --sync     Sync local directory to remote destination
-  -d, --details  List statistics of local directory
+  -h, --help            show this help message and exit
+  -d, --details         List statistics of local directory
+  -m, --markdown        Output file names as Markdown links
+  -s SYNC, --sync SYNC  Set direction of sync, local for pull and remote for
+                        push
 ```
