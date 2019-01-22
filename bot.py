@@ -25,7 +25,7 @@ def search(bot, update, args):
         for item in iter(sorted(found_files)):
             message += "[{}]({}/{})\n".format(item, REMOTE_URL, item)
 
-        bot.send_message(update.message.chat_id, message, "Markdown")
+        bot.send_message(update.message.chat_id, message, "Markdown", disable_web_page_preview=True)
 
 
 def main():
