@@ -11,7 +11,8 @@ LOCAL_DIR = config["SOURCE"]["DIR"]
 REMOTE_URL = config["DEST"]["PUBLIC_URL"]
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+                    level=logging.INFO,
+                    filename="log.log")
 
 
 def search(bot, update, args):
