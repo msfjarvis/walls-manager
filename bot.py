@@ -5,8 +5,10 @@ import configparser
 import logging
 from random import randint
 
+from telegram import ChatAction
 from telegram.ext import Updater, CommandHandler
 
+from decorators import send_action
 from search import search_files
 
 config = configparser.ConfigParser()  # pylint: disable=invalid-name
@@ -20,6 +22,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     filename="log.log")
 
 
+@send_action(ChatAction.TYPING)
 def search(bot, update, args):
     pretty_name, found_files = find_files(args)
     if not found_files:
@@ -31,6 +34,8 @@ def search(bot, update, args):
 
         bot.send_message(update.message.chat_id, message, "Markdown", disable_web_page_preview=True)
 
+
+@send_action(ChatAction.UPLOAD_PHOTO)
 def get(bot, update, args):
     pretty_name, found_files = find_files(args)
     if not found_files:
@@ -40,11 +45,13 @@ def get(bot, update, args):
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
         bot.send_photo(update.message.chat_id, open(selected_file_path, 'rb'))
 
+
 def find_files(args):
     name = "_".join(args).lower().capitalize()
     pretty_name = " ".join(args)
     found_files = search_files(name, LOCAL_DIR)
     return pretty_name, found_files
+
 
 def main():
     updater = Updater(TOKEN)
