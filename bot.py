@@ -41,7 +41,7 @@ def get(bot, update, args):
         bot.send_photo(update.message.chat_id, open(selected_file_path, 'rb'))
 
 def find_files(args):
-    name = "_".join(args)
+    name = "_".join(args).lower().capitalize()
     pretty_name = " ".join(args)
     found_files = search_files(name, LOCAL_DIR)
     return pretty_name, found_files
