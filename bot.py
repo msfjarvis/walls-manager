@@ -50,7 +50,9 @@ def get(bot, update, args):
     else:
         selected_name = found_files[randint(0, len(found_files) - 1)]
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
-        bot.send_photo(update.message.chat_id, open(selected_file_path, 'rb'))
+        caption = "[{0}]({1}/{0})".format(selected_name, REMOTE_URL)
+        bot.send_photo(chat_id=update.message.chat_id, photo=open(selected_file_path, 'rb'), caption=caption,
+                       parse_mode="Markdown")
 
 
 def find_files(args):
