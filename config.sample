@@ -1,12 +1,12 @@
 [SOURCE]
-    DIR=/path/to/your/local/folder/with/trailing/slash/
+DIR=/path/to/your/local/folder/with/trailing/slash/
 
 # RSYNC_DIRS can be a comma separated list as well if you intend to maintain more than one mirror
 [DEST]
-    RSYNC_DIRS=user@host:/path/to/remote/dir/without/trailing/slash
-    PUBLIC_URL=https://domain.tld/folder/
+RSYNC_DIRS=user@host:/path/to/remote/dir/without/trailing/slash
+PUBLIC_URL=https://domain.tld/folder/
 
 [BOT]
-    TOKEN=th1s1sd3f1n1t3lyn0th0wt0k3nsl00kl1k3:1239574
-    # The ID of the owner
-    MASTER=123456789
+TOKEN=th1s1sd3f1n1t3lyn0th0wt0k3nsl00kl1k3:1239574
+# The ID of the owner
+MASTER=123456789
