@@ -26,33 +26,35 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 @send_action(ChatAction.TYPING)
 def search(bot, update, args):
     if not args:
-        bot.send_message(update.message.chat_id, "Please specify who to search for!")
+        update.message.reply_text("Please specify who to search for!", quote=True)
         return
     pretty_name, found_files = find_files(args)
     if not found_files:
-        update.message.reply_text("No files found for search term '{}'".format(pretty_name))
+        update.message.reply_text("No files found for search term '{}'".format(pretty_name), quote=True)
     else:
         message = "Results for '{}':\n".format(pretty_name)
         for item in iter(sorted(found_files)):
             message += "[{0}]({1}/{0})\n".format(item, REMOTE_URL)
 
-        bot.send_message(update.message.chat_id, message, "Markdown", disable_web_page_preview=True)
+        update.message.reply_text(message, "Markdown", disable_web_page_preview=True, quote=True)
 
 
 @send_action(ChatAction.UPLOAD_PHOTO)
 def get(bot, update, args):
     if not args:
-        bot.send_message(update.message.chat_id, "Please specify who to search for!")
+        update.message.reply_text("Please specify who to search for!", quote=True)
         return
     pretty_name, found_files = find_files(args)
     if not found_files:
-        update.message.reply_text("No files found for search term '{}'".format(pretty_name))
+        update.message.reply_text("No files found for search term '{}'".format(pretty_name), quote=True)
     else:
         selected_name = found_files[randint(0, len(found_files) - 1)]
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
         caption = "[{0}]({1}/{0})".format(selected_name, REMOTE_URL)
-        bot.send_photo(chat_id=update.message.chat_id, photo=open(selected_file_path, 'rb'), caption=caption,
-                       parse_mode="Markdown")
+        update.message.reply_photo(photo=open(selected_file_path, 'rb'),
+                                   caption=caption,
+                                   parse_mode="Markdown",
+                                   quote=True)
 
 
 def find_files(args):
