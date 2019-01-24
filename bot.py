@@ -8,7 +8,7 @@ from random import randint
 from telegram import ChatAction
 from telegram.ext import Updater, CommandHandler
 
-from decorators import send_action
+from decorators import send_action, restricted
 from search import search_files
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -57,6 +57,13 @@ def get(bot, update, args):
                                    quote=True)
 
 
+@restricted
+@send_action(ChatAction.UPLOAD_DOCUMENT)
+def get_log(bot, update):
+    update.message.reply_document(document=open("log.log", "rb"),
+                                  quote=True)
+
+
 def find_files(args):
     args_copy = []
     for arg in iter(args):
@@ -72,6 +79,7 @@ def main():
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("get", get, pass_args=True))
+    dispatcher.add_handler(CommandHandler("log", get_log))
     updater.start_polling()
     updater.idle()
 
