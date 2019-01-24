@@ -3,6 +3,7 @@
 
 import configparser
 import logging
+import os
 from random import randint
 
 from telegram import ChatAction
@@ -17,6 +18,7 @@ config.read("config.ini")
 TOKEN = config["BOT"]["TOKEN"]
 LOCAL_DIR = config["SOURCE"]["DIR"]
 REMOTE_URL = config["DEST"]["PUBLIC_URL"]
+PHOTO_SIZE_THRESHOLD = 5242880  # 5mB, from Telegram documentation.
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG,
@@ -51,10 +53,16 @@ def get(bot, update, args):
         selected_name = found_files[randint(0, len(found_files) - 1)]
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
         caption = "[{0}]({1}/{0})".format(selected_name, REMOTE_URL)
-        update.message.reply_photo(photo=open(selected_file_path, 'rb'),
-                                   caption=caption,
-                                   parse_mode="Markdown",
-                                   quote=True)
+        if (os.path.getsize(selected_file_path)) > PHOTO_SIZE_THRESHOLD:
+            update.message.reply_document(document=open(selected_file_path, 'rb'),
+                                          caption=caption,
+                                          parse_mode="Markdown",
+                                          quote=True)
+        else:
+            update.message.reply_photo(photo=open(selected_file_path, 'rb'),
+                                       caption=caption,
+                                       parse_mode="Markdown",
+                                       quote=True)
 
 
 @restricted
