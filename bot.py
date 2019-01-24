@@ -11,6 +11,7 @@ from telegram.ext import Updater, CommandHandler
 from decorators import send_action
 from search import search_files
 
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 config = configparser.ConfigParser()  # pylint: disable=invalid-name
 config.read("config.ini")
 TOKEN = config["BOT"]["TOKEN"]
@@ -18,7 +19,7 @@ LOCAL_DIR = config["SOURCE"]["DIR"]
 REMOTE_URL = config["DEST"]["PUBLIC_URL"]
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO,
+                    level=logging.DEBUG,
                     filename="log.log")
 
 
