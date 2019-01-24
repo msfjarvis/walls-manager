@@ -25,6 +25,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 @send_action(ChatAction.TYPING)
 def search(bot, update, args):
+    if not args:
+        bot.send_message(update.message.chat_id, "Please specify who to search for!")
+        return
     pretty_name, found_files = find_files(args)
     if not found_files:
         update.message.reply_text("No files found for search term '{}'".format(pretty_name))
@@ -38,6 +41,9 @@ def search(bot, update, args):
 
 @send_action(ChatAction.UPLOAD_PHOTO)
 def get(bot, update, args):
+    if not args:
+        bot.send_message(update.message.chat_id, "Please specify who to search for!")
+        return
     pretty_name, found_files = find_files(args)
     if not found_files:
         update.message.reply_text("No files found for search term '{}'".format(pretty_name))
