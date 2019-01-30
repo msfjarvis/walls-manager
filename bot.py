@@ -41,7 +41,20 @@ def search(bot, update, args):
         update.message.reply_text(message, "Markdown", disable_web_page_preview=True, quote=True)
 
 
-@send_action(ChatAction.UPLOAD_PHOTO)
+def upload_photo(update, file_path, caption):
+    update.message.reply_photo(photo=open(file_path, 'rb'),
+                               caption=caption,
+                               parse_mode="Markdown",
+                               quote=True)
+
+
+def upload_document(update, file_path, caption):
+    update.message.reply_document(document=open(file_path, 'rb'),
+                                  caption=caption,
+                                  parse_mode="Markdown",
+                                  quote=True)
+
+
 def get(bot, update, args):
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
@@ -54,15 +67,11 @@ def get(bot, update, args):
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
         caption = "[{0}]({1}/{0})".format(selected_name, REMOTE_URL)
         if (os.path.getsize(selected_file_path)) > PHOTO_SIZE_THRESHOLD:
-            update.message.reply_document(document=open(selected_file_path, 'rb'),
-                                          caption=caption,
-                                          parse_mode="Markdown",
-                                          quote=True)
+            bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
+            upload_document(update, selected_file_path, caption)
         else:
-            update.message.reply_photo(photo=open(selected_file_path, 'rb'),
-                                       caption=caption,
-                                       parse_mode="Markdown",
-                                       quote=True)
+            bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_PHOTO)
+            upload_photo(update, selected_file_path, caption)
 
 
 @restricted
