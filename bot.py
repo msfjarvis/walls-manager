@@ -83,11 +83,17 @@ def get_log(bot, update):
 def find_files(args):
     args_copy = []
     for arg in iter(args):
-        args_copy.append(arg.lower().capitalize())
+        args_copy.append(capitalize(arg))
     name = "_".join(args_copy)
     pretty_name = " ".join(args)
     found_files = search_files(name, LOCAL_DIR)
     return pretty_name, found_files
+
+
+def capitalize(string):
+    chars = list(string)
+    chars[0] = chars[0].upper()
+    return "".join(chars)
 
 
 def main():
