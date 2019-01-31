@@ -21,8 +21,7 @@ REMOTE_URL = config["DEST"]["PUBLIC_URL"]
 PHOTO_SIZE_THRESHOLD = 5242880  # 5mB, from Telegram documentation.
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.DEBUG,
-                    filename="log.log")
+                    level=logging.DEBUG)
 
 
 @send_action(ChatAction.TYPING)
@@ -92,6 +91,8 @@ def find_files(args):
 
 
 def main():
+    if os.getenv("DEBUG", "") != "":
+        logging.basicConfig(filename="log.log")
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
