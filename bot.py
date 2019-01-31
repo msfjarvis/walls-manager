@@ -43,14 +43,16 @@ def search(bot, update, args):
                                   quote=True)
 
 
-def upload_photo(update, file_path, caption):
+def upload_photo(bot, update, file_path, caption):
+    bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_PHOTO)
     update.message.reply_photo(photo=open(file_path, 'rb'),
                                caption=caption,
                                parse_mode="Markdown",
                                quote=True)
 
 
-def upload_document(update, file_path, caption):
+def upload_document(bot, update, file_path, caption):
+    bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
     update.message.reply_document(document=open(file_path, 'rb'),
                                   caption=caption,
                                   parse_mode="Markdown",
@@ -70,16 +72,13 @@ def get(bot, update, args):
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
         caption = "[{0}]({1}/{0})".format(selected_name, REMOTE_URL)
         if (os.path.getsize(selected_file_path)) > PHOTO_SIZE_THRESHOLD:
-            bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
-            upload_document(update, selected_file_path, caption)
+            upload_document(bot, update, selected_file_path, caption)
         else:
             try:
-                bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_PHOTO)
-                upload_photo(update, selected_file_path, caption)
+                upload_photo(bot, update, selected_file_path, caption)
             except BadRequest:
                 logger.debug("BadRequest caught during upload_photo, falling back to document")
-                bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
-                upload_document(update, selected_file_path, caption)
+                upload_document(bot, update, selected_file_path, caption)
 
 
 @restricted

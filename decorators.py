@@ -9,7 +9,6 @@ LIST_OF_ADMINS = [211931420]
 
 def send_action(action: ChatAction):
     """Sends `action` while processing func command."""
-
     def decorator(func):
         @wraps(func)
         def command_func(*args, **kwargs):
@@ -23,6 +22,7 @@ def send_action(action: ChatAction):
 
 
 def restricted(func):
+    """Restricts commands to admins specified in 'LIST_OF_ADMINS'"""
     @wraps(func)
     def wrapped(bot, update, *args, **kwargs):
         user_id = update.effective_user.id
