@@ -7,6 +7,7 @@ import os
 from random import randint
 
 from telegram import ChatAction
+from telegram.error import BadRequest
 from telegram.ext import Updater, CommandHandler
 
 from decorators import send_action, restricted
@@ -72,8 +73,13 @@ def get(bot, update, args):
             bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
             upload_document(update, selected_file_path, caption)
         else:
-            bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_PHOTO)
-            upload_photo(update, selected_file_path, caption)
+            try:
+                bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_PHOTO)
+                upload_photo(update, selected_file_path, caption)
+            except BadRequest:
+                logger.debug("BadRequest caught during upload_photo, falling back to document")
+                bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
+                upload_document(update, selected_file_path, caption)
 
 
 @restricted
