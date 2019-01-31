@@ -27,6 +27,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 @send_action(ChatAction.TYPING)
 def search(bot, update, args):
+    del bot
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
         return
@@ -84,6 +85,7 @@ def get(bot, update, args):
 @restricted
 @send_action(ChatAction.UPLOAD_DOCUMENT)
 def get_log(bot, update):
+    del bot
     update.message.reply_document(document=open("log.log", "rb"),
                                   quote=True)
 
