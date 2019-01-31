@@ -31,13 +31,15 @@ def search(bot, update, args):
         return
     pretty_name, found_files = find_files(args)
     if not found_files:
-        update.message.reply_text("No files found for search term '{}'".format(pretty_name), quote=True)
+        update.message.reply_text("No files found for search term '{}'".format(pretty_name),
+                                  quote=True)
     else:
         message = "Results for '{}':\n".format(pretty_name)
         for item in iter(sorted(found_files)):
             message += "[{0}]({1}/{0})\n".format(item, REMOTE_URL)
 
-        update.message.reply_text(message, "Markdown", disable_web_page_preview=True, quote=True)
+        update.message.reply_text(message, "Markdown", disable_web_page_preview=True,
+                                  quote=True)
 
 
 def upload_photo(update, file_path, caption):
@@ -60,7 +62,8 @@ def get(bot, update, args):
         return
     pretty_name, found_files = find_files(args)
     if not found_files:
-        update.message.reply_text("No files found for search term '{}'".format(pretty_name), quote=True)
+        update.message.reply_text("No files found for search term '{}'".format(pretty_name),
+                                  quote=True)
     else:
         selected_name = found_files[randint(0, len(found_files) - 1)]
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
