@@ -39,14 +39,18 @@ def calc_size(directory='.'):
     return convert_size(total_size)
 
 
-def parse_and_display_stats(directory='.'):
+def parse_and_display_stats(directory='.', format_for_telegram=False):
     total_count = walk_dir(directory)
-    print("Directory analysis for {}\n".format(directory))
+    final_results = "Directory analysis for {}\n".format(directory)
     for key, value in sorted(PICTURE_STATS.items()):
-        print("{}: {}".format(key.replace("_", " "), value))
-    print("\nTotal images: {}".format(total_count))
-    print("Total models: {}".format(len(PICTURE_STATS)))
-    print("Total size: {}".format(calc_size(directory)))
+        final_results += "{}: {}\n".format(key.replace("_", " "), value)
+    final_results += "\nTotal images: {}".format(total_count)
+    final_results += "\nTotal models: {}".format(len(PICTURE_STATS))
+    final_results += "\nTotal size: {}".format(calc_size(directory))
+    if not format_for_telegram:
+        print(final_results)
+    else:
+        return final_results
 
 
 if __name__ == '__main__':
