@@ -57,7 +57,7 @@ def upload_document(bot, update, file_path, caption):
                                   quote=True)
 
 
-def get(bot, update, args):
+def get_file_and_caption(update, args):
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
         return
@@ -69,14 +69,24 @@ def get(bot, update, args):
         selected_name = found_files[randint(0, len(found_files) - 1)]
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
         caption = "[{0}]({1}/{0})".format(selected_name, REMOTE_URL)
-        if (os.path.getsize(selected_file_path)) > PHOTO_SIZE_THRESHOLD:
-            upload_document(bot, update, selected_file_path, caption)
-        else:
-            try:
-                upload_photo(bot, update, selected_file_path, caption)
-            except BadRequest:
-                logger.debug("BadRequest caught during upload_photo, falling back to document")
-                upload_document(bot, update, selected_file_path, caption)
+    return selected_file_path, caption
+
+
+def get(bot, update, args):
+    file_path, caption = get_file_and_caption(update, args)
+    if (os.path.getsize(file_path)) > PHOTO_SIZE_THRESHOLD:
+        upload_document(bot, update, file_path, caption)
+    else:
+        try:
+            upload_photo(bot, update, file_path, caption)
+        except BadRequest:
+            logger.debug("BadRequest caught during upload_photo, falling back to document")
+            upload_document(bot, update, file_path, caption)
+
+
+def get_file(bot, update, args):
+    file_path, caption = get_file_and_caption(update, args)
+    upload_document(bot, update, file_path, caption)
 
 
 @restricted
@@ -119,6 +129,7 @@ def main():
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("get", get, pass_args=True))
+    dispatcher.add_handler(CommandHandler("getfile", get_file, pass_args=True))
     dispatcher.add_handler(CommandHandler("log", get_log))
     updater.start_polling()
     updater.idle()
