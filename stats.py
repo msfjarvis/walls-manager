@@ -41,7 +41,7 @@ def calc_size(directory='.'):
 
 def parse_and_display_stats(directory='.', format_for_telegram=False):
     total_count = walk_dir(directory)
-    final_results = "Directory analysis for {}\n".format(directory)
+    final_results = ""
     for key, value in sorted(PICTURE_STATS.items()):
         final_results += "{}: {}\n".format(key.replace("_", " "), value)
     final_results += "\nTotal images: {}".format(total_count)
