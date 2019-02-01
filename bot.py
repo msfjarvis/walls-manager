@@ -11,6 +11,7 @@ from telegram.error import BadRequest
 from telegram.ext import Updater, CommandHandler
 
 from decorators import send_action, restricted
+from stats import parse_and_display_stats
 from search import search_files
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -39,6 +40,14 @@ def search(bot, update, args):
 
         update.message.reply_text(message, "Markdown", disable_web_page_preview=True,
                                   quote=True)
+
+
+@restricted
+@send_action(ChatAction.TYPING)
+def get_stats(bot, update):
+    update.message.reply_text(parse_and_display_stats(LOCAL_DIR, True),
+                              parse_mode="Markdown",
+                              quote=True)
 
 
 def upload_photo(bot, update, file_path, caption):
@@ -127,10 +136,11 @@ def main():
     configure_logging()
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("get", get, pass_args=True))
     dispatcher.add_handler(CommandHandler("getfile", get_file, pass_args=True))
     dispatcher.add_handler(CommandHandler("log", get_log))
+    dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
+    dispatcher.add_handler(CommandHandler("stats", get_stats))
     updater.start_polling()
     updater.idle()
 
