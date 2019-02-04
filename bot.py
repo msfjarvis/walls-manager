@@ -5,7 +5,6 @@ import configparser
 import logging
 import os
 from random import randint
-from signal import signal, SIGTERM, SIGINT
 
 import pickledb
 from telegram import ChatAction
@@ -17,7 +16,7 @@ from file_helpers import find_files, md5
 from stats import parse_and_display_stats
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
-database = pickledb.load("tg_file_ids.db", False)  # pylint: disable=invalid-name
+database = pickledb.load("tg_file_ids.db", True)  # pylint: disable=invalid-name
 config = configparser.ConfigParser()  # pylint: disable=invalid-name
 config.read("config.ini")
 TOKEN = config["BOT"]["TOKEN"]
@@ -146,14 +145,7 @@ def configure_logging():
                             filename="log.log")
 
 
-def handle_exit(*args):
-    del args
-    database.dump()
-
-
 def main():
-    for sig in (SIGTERM, SIGINT):
-        signal(sig, handle_exit)
     configure_logging()
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
