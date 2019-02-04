@@ -5,7 +5,10 @@ import configparser
 import logging
 import os
 from random import randint
+import hashlib
+from signal import signal, SIGTERM, SIGINT
 
+import pickledb
 from telegram import ChatAction
 from telegram.error import BadRequest
 from telegram.ext import Updater, CommandHandler
@@ -15,6 +18,7 @@ from stats import parse_and_display_stats
 from search import search_files
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+database = pickledb.load("tg_file_ids.db", False)  # pylint: disable=invalid-name
 config = configparser.ConfigParser()  # pylint: disable=invalid-name
 config.read("config.ini")
 TOKEN = config["BOT"]["TOKEN"]
@@ -54,19 +58,40 @@ def get_stats(bot, update):
 @send_action(ChatAction.UPLOAD_PHOTO)
 def upload_photo(bot, update, file_path, caption):
     del bot
-    update.message.reply_photo(photo=open(file_path, 'rb'),
-                               caption=caption,
-                               parse_mode="Markdown",
-                               quote=True)
+    file_hash = md5(file_path)
+    telegram_id = database.get(file_hash)
+    if telegram_id:
+        logger.debug("Found {} in cache!".format(file_path.split("/")[-1]))
+        update.message.reply_photo(photo=telegram_id,
+                                   caption=caption,
+                                   parse_mode="Markdown",
+                                   quote=True)
+        return
+    message = update.message.reply_photo(photo=open(file_path, "rb"),
+                                         caption=caption,
+                                         parse_mode="Markdown",
+                                         quote=True)
+    database.set(file_hash, message.photo[0].file_id)
 
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
 def upload_document(bot, update, file_path, caption):
     del bot
-    update.message.reply_document(document=open(file_path, 'rb'),
-                                  caption=caption,
-                                  parse_mode="Markdown",
-                                  quote=True)
+    file_hash = md5(file_path)
+    telegram_id = database.get(file_hash)
+    if telegram_id:
+        logger.debug("Found {} in cache!".format(file_path.split("/")[-1]))
+        update.message.reply_document(document=telegram_id,
+                                      caption=caption,
+                                      parse_mode="Markdown",
+                                      quote=True)
+        return
+
+    message = update.message.reply_document(document=open(file_path, 'rb'),
+                                            caption=caption,
+                                            parse_mode="Markdown",
+                                            quote=True)
+    database.set(file_hash, message.document.file_id)
 
 
 def get_file_and_caption(update, args):
@@ -122,6 +147,14 @@ def find_files(args):
     return pretty_name, found_files
 
 
+def md5(file_name):
+    hash_md5 = hashlib.md5()
+    with open(file_name, "rb") as f:
+        for chunk in iter(lambda: f.read(2 ** 20), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
+
 def capitalize(string):
     chars = list(string)
     chars[0] = chars[0].upper()
@@ -138,7 +171,14 @@ def configure_logging():
                             filename="log.log")
 
 
+def handle_exit(*args):
+    del args
+    database.dump()
+
+
 def main():
+    for sig in (SIGTERM, SIGINT):
+        signal(sig, handle_exit)
     configure_logging()
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
