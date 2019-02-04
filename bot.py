@@ -5,7 +5,6 @@ import configparser
 import logging
 import os
 from random import randint
-import hashlib
 from signal import signal, SIGTERM, SIGINT
 
 import pickledb
@@ -14,8 +13,8 @@ from telegram.error import BadRequest
 from telegram.ext import Updater, CommandHandler
 
 from decorators import send_action, restricted
+from file_helpers import find_files, md5
 from stats import parse_and_display_stats
-from search import search_files
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 database = pickledb.load("tg_file_ids.db", False)  # pylint: disable=invalid-name
@@ -33,7 +32,7 @@ def search(bot, update, args):
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
         return
-    pretty_name, found_files = find_files(args)
+    pretty_name, found_files = find_files(args, LOCAL_DIR)
     if not found_files:
         update.message.reply_text("No files found for search term '{}'".format(pretty_name),
                                   quote=True)
@@ -98,7 +97,7 @@ def get_file_and_caption(update, args):
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
         return
-    pretty_name, found_files = find_files(args)
+    pretty_name, found_files = find_files(args, LOCAL_DIR)
     if not found_files:
         update.message.reply_text("No files found for search term '{}'".format(pretty_name),
                                   quote=True)
@@ -135,30 +134,6 @@ def get_log(bot, update):
     del bot
     update.message.reply_document(document=open("log.log", "rb"),
                                   quote=True)
-
-
-def find_files(args):
-    args_copy = []
-    for arg in iter(args):
-        args_copy.append(capitalize(arg))
-    name = "_".join(args_copy)
-    pretty_name = " ".join(args)
-    found_files = search_files(name, LOCAL_DIR)
-    return pretty_name, found_files
-
-
-def md5(file_name):
-    hash_md5 = hashlib.md5()
-    with open(file_name, "rb") as f:
-        for chunk in iter(lambda: f.read(2 ** 20), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
-
-
-def capitalize(string):
-    chars = list(string)
-    chars[0] = chars[0].upper()
-    return "".join(chars)
 
 
 def configure_logging():
