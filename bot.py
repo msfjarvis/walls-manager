@@ -45,6 +45,7 @@ def search(bot, update, args):
 @restricted
 @send_action(ChatAction.TYPING)
 def get_stats(bot, update):
+    del bot
     update.message.reply_text(parse_and_display_stats(LOCAL_DIR, True),
                               parse_mode="Markdown",
                               quote=True)
