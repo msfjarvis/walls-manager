@@ -74,6 +74,7 @@ def get_file_and_caption(update, args):
     if not found_files:
         update.message.reply_text("No files found for search term '{}'".format(pretty_name),
                                   quote=True)
+        return "", ""
     else:
         selected_name = found_files[randint(0, len(found_files) - 1)]
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
@@ -83,6 +84,8 @@ def get_file_and_caption(update, args):
 
 def get(bot, update, args):
     file_path, caption = get_file_and_caption(update, args)
+    if file_path == "" and caption == "":
+        return
     if (os.path.getsize(file_path)) > PHOTO_SIZE_THRESHOLD:
         upload_document(bot, update, file_path, caption)
     else:
