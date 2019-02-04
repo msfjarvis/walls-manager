@@ -51,16 +51,18 @@ def get_stats(bot, update):
                               quote=True)
 
 
+@send_action(ChatAction.UPLOAD_PHOTO)
 def upload_photo(bot, update, file_path, caption):
-    bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_PHOTO)
+    del bot
     update.message.reply_photo(photo=open(file_path, 'rb'),
                                caption=caption,
                                parse_mode="Markdown",
                                quote=True)
 
 
+@send_action(ChatAction.UPLOAD_DOCUMENT)
 def upload_document(bot, update, file_path, caption):
-    bot.send_chat_action(chat_id=update.message.chat_id, action=ChatAction.UPLOAD_DOCUMENT)
+    del bot
     update.message.reply_document(document=open(file_path, 'rb'),
                                   caption=caption,
                                   parse_mode="Markdown",
