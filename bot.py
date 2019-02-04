@@ -136,7 +136,7 @@ def main():
     configure_logging()
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler("get", get, pass_args=True))
+    dispatcher.add_handler(CommandHandler("pic", get, pass_args=True))
     dispatcher.add_handler(CommandHandler("getfile", get_file, pass_args=True))
     dispatcher.add_handler(CommandHandler("log", get_log))
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
