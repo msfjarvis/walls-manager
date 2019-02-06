@@ -26,9 +26,9 @@ def sync_to_remote(remote_dirs, local_dir, markdown_output, remote_url):
                                                              extract_pretty_name(next_line),
                                                              markdown_output)))
             elif next_line.find("*deleting") != -1:
-                print("Deleting: {}".format(extract_pretty_name(next_line)))
+                print("Deleted: {}".format(extract_pretty_name(next_line)))
             elif next_line.find("<f.st......") != -1:
-                print("Updating: {}".format(print_names(remote_url,
+                print("Updated wallpaper: {}".format(print_names(remote_url,
                                                         extract_pretty_name(next_line),
                                                         markdown_output)))
 
