@@ -38,7 +38,7 @@ def search(bot, update, args):
     else:
         message = "Results for '{}':\n".format(pretty_name)
         for item in iter(sorted(found_files)):
-            message += "[{0}]({1}/{0})\n".format(item, REMOTE_URL)
+            message += "[{0}]({1}{0})\n".format(item, REMOTE_URL)
 
         update.message.reply_text(message, "Markdown", disable_web_page_preview=True,
                                   quote=True)
@@ -104,7 +104,7 @@ def get_file_and_caption(update, args):
     else:
         selected_name = found_files[randint(0, len(found_files) - 1)]
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
-        caption = "[{0}]({1}/{0})".format(selected_name, REMOTE_URL)
+        caption = "[{0}]({1}{0})".format(selected_name, REMOTE_URL)
     return selected_file_path, caption
 
 
