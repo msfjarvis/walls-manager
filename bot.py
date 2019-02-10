@@ -12,7 +12,7 @@ from telegram.error import BadRequest, TimedOut
 from telegram.ext import Updater, CommandHandler
 
 from decorators import send_action, restricted
-from file_helpers import find_files, md5
+from file_helpers import find_files, md5, get_base_name
 from stats import parse_and_display_stats, list_all_files, get_random_file as random_file
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -82,7 +82,7 @@ def get_stats(bot, update):
 
 def get_random_file(bot, update):
     file = random_file(LOCAL_DIR)
-    upload_photo(bot, update, file, get_caption(file.split("/")[-1]))
+    upload_photo(bot, update, file, get_caption(get_base_name(file)))
 
 
 @restricted
@@ -92,7 +92,7 @@ def populate_cache(bot, update):
         file_hash = md5(file)
         if database.get(file_hash):
             continue
-        upload_photo_internal(bot, update, file, get_caption(file.split("/")[-1]))
+        upload_photo_internal(bot, update, file, get_caption(get_base_name(file)))
 
 
 def upload_photo(bot, update, file_path, caption):

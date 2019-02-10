@@ -22,3 +22,7 @@ def md5(file_name):
         for chunk in iter(lambda: f.read(2 ** 20), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+def get_base_name(file_path):
+    return file_path.split("/")[-1]
