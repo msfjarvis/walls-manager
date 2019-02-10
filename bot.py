@@ -32,11 +32,7 @@ def get(bot, update, args):
     if (os.path.getsize(file_path)) > PHOTO_SIZE_THRESHOLD:
         upload_document(bot, update, file_path, caption)
     else:
-        try:
-            upload_photo(bot, update, file_path, caption)
-        except BadRequest:
-            logger.debug("BadRequest caught during upload_photo, falling back to document")
-            upload_document(bot, update, file_path, caption)
+        upload_photo(bot, update, file_path, caption)
 
 
 def get_file(bot, update, args):
@@ -120,7 +116,6 @@ def upload_document(bot, update, file_path, caption):
 
 @send_action(ChatAction.UPLOAD_PHOTO)
 def upload_photo_internal(bot, update, file, caption, telegram_id=None):
-    del bot
     try:
         if telegram_id:
             update.message.reply_photo(photo=telegram_id,
@@ -136,6 +131,9 @@ def upload_photo_internal(bot, update, file, caption, telegram_id=None):
     except TimedOut:
         logger.error("Timed out in upload_photo_internal")
         update.message.reply_text("Timed out.", parse_mode="Markdown")
+    except BadRequest:
+        logger.error("BadRequest raised in upload_photo_internal, falling back to document")
+        return upload_document_internal(bot, update, file, caption, telegram_id)
     return None
 
 
