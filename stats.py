@@ -7,7 +7,7 @@ import os
 PICTURE_STATS = {}
 
 
-def get_random_file(directory='.', extension='.jpg'):
+def get_random_file(directory='.', extension='jpg'):
     all_files = list_all_files(directory, extension)
     total_count = len(all_files)
     return os.path.join(directory, all_files[random.randint(0, total_count - 1)])
@@ -15,15 +15,14 @@ def get_random_file(directory='.', extension='.jpg'):
 
 def list_all_files(directory='.', extension='jpg'):
     all_files = []
-    extension = extension.lower()
     for _, _, files in os.walk(directory):
         for name in files:
-            if extension and name.lower().endswith(extension):
+            if extension and name.endswith(extension):
                 sanitized_name = name.replace(".{}".format(extension), "")
                 count = sanitized_name.split("_")[-1]
                 model_name = sanitized_name.replace("_{}".format(count), "")
                 PICTURE_STATS[model_name] = PICTURE_STATS.get(model_name, 0) + 1
-                all_files.append(name)
+                all_files.append(os.path.join(directory, name))
     return all_files
 
 
