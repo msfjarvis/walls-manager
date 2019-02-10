@@ -130,6 +130,7 @@ def upload_photo_internal(bot, update, file, caption, telegram_id=None):
     except TimedOut:
         logger.error("Timed out in upload_photo_internal")
         update.message.reply_text("Timed out.", parse_mode="Markdown")
+    return None
 
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
@@ -149,6 +150,7 @@ def upload_document_internal(bot, update, file, caption, telegram_id=None):
     except TimedOut:
         logger.error("Timed out in upload_document_internal")
         update.message.reply_text("Timed out.", parse_mode="Markdown")
+    return None
 
 
 def get_file_and_caption(update, args):
