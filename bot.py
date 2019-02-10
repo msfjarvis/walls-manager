@@ -105,22 +105,11 @@ def upload_photo(bot, update, file_path, caption):
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
 def upload_document(bot, update, file_path, caption):
-    del bot
     file_hash = md5(file_path)
     telegram_id = database.get(file_hash)
-    if telegram_id:
-        logger.debug("Found {} in cache!".format(file_path.split("/")[-1]))
-        update.message.reply_document(document=telegram_id,
-                                      caption=caption,
-                                      parse_mode="Markdown",
-                                      quote=True)
-        return
-
-    message = update.message.reply_document(document=open(file_path, 'rb'),
-                                            caption=caption,
-                                            parse_mode="Markdown",
-                                            quote=True)
-    database.set(file_hash, message.document.file_id)
+    message = upload_document_internal(bot, update, file_path, caption, telegram_id)
+    if message:
+        database.set(file_hash, message.document.file_id)
 
 
 @send_action(ChatAction.UPLOAD_PHOTO)
@@ -137,6 +126,21 @@ def upload_photo_internal(bot, update, file, caption, telegram_id=None):
                                           caption=caption,
                                           parse_mode="Markdown",
                                           quote=True)
+
+
+@send_action(ChatAction.UPLOAD_DOCUMENT)
+def upload_document_internal(bot, update, file, caption, telegram_id=None):
+    del bot
+    if telegram_id:
+        update.message.reply_document(document=telegram_id,
+                                      caption=caption,
+                                      parse_mode="Markdown",
+                                      quote=True)
+    else:
+        return update.message.reply_document(document=open(file, 'rb'),
+                                             caption=caption,
+                                             parse_mode="Markdown",
+                                             quote=True)
 
 
 def get_file_and_caption(update, args):
