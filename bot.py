@@ -13,7 +13,7 @@ from telegram.ext import Updater, CommandHandler
 
 from decorators import send_action, restricted
 from file_helpers import find_files, md5
-from stats import parse_and_display_stats, get_random_file as random_file
+from stats import parse_and_display_stats, list_all_files, get_random_file as random_file
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 database = pickledb.load("tg_file_ids.db", True)  # pylint: disable=invalid-name
@@ -85,23 +85,22 @@ def get_random_file(bot, update):
     upload_photo(bot, update, file, get_caption(file.split("/")[-1]))
 
 
-@send_action(ChatAction.UPLOAD_PHOTO)
+@restricted
+def populate_cache(bot, update):
+    all_files = list_all_files(LOCAL_DIR)
+    for file in iter(all_files):
+        file_hash = md5(file)
+        if database.get(file_hash):
+            continue
+        upload_photo_internal(bot, update, file, get_caption(file.split("/")[-1]))
+
+
 def upload_photo(bot, update, file_path, caption):
-    del bot
     file_hash = md5(file_path)
     telegram_id = database.get(file_hash)
-    if telegram_id:
-        logger.debug("Found {} in cache!".format(file_path.split("/")[-1]))
-        update.message.reply_photo(photo=telegram_id,
-                                   caption=caption,
-                                   parse_mode="Markdown",
-                                   quote=True)
-        return
-    message = update.message.reply_photo(photo=open(file_path, "rb"),
-                                         caption=caption,
-                                         parse_mode="Markdown",
-                                         quote=True)
-    database.set(file_hash, message.photo[0].file_id)
+    message = upload_photo_internal(bot, update, file_path, telegram_id, caption)
+    if message:
+        database.set(file_hash, message.photo[0].file_id)
 
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
@@ -122,6 +121,22 @@ def upload_document(bot, update, file_path, caption):
                                             parse_mode="Markdown",
                                             quote=True)
     database.set(file_hash, message.document.file_id)
+
+
+@send_action(ChatAction.UPLOAD_PHOTO)
+def upload_photo_internal(bot, update, file, caption, telegram_id=None):
+    del bot
+    if telegram_id:
+        update.message.reply_photo(photo=telegram_id,
+                                   caption=caption,
+                                   parse_mode="Markdown",
+                                   quote=True)
+        return None
+    else:
+        return update.message.reply_photo(photo=open(file, "rb"),
+                                          caption=caption,
+                                          parse_mode="Markdown",
+                                          quote=True)
 
 
 def get_file_and_caption(update, args):
@@ -164,6 +179,7 @@ def main():
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("stats", get_stats))
     dispatcher.add_handler(CommandHandler("random", get_random_file))
+    dispatcher.add_handler(CommandHandler("cache", populate_cache))
     updater.start_polling()
     updater.idle()
 
