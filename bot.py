@@ -13,7 +13,7 @@ from telegram.ext import Updater, CommandHandler
 
 from decorators import send_action, restricted
 from file_helpers import find_files, md5
-from stats import parse_and_display_stats
+from stats import parse_and_display_stats, get_random_file as random_file
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 database = pickledb.load("tg_file_ids.db", True)  # pylint: disable=invalid-name
@@ -23,6 +23,33 @@ TOKEN = config["BOT"]["TOKEN"]
 LOCAL_DIR = config["SOURCE"]["DIR"]
 REMOTE_URL = config["DEST"]["PUBLIC_URL"]
 PHOTO_SIZE_THRESHOLD = 5242880  # 5mB, from Telegram documentation.
+
+
+def get(bot, update, args):
+    file_path, caption = get_file_and_caption(update, args)
+    if not file_path and not caption:
+        return
+    if (os.path.getsize(file_path)) > PHOTO_SIZE_THRESHOLD:
+        upload_document(bot, update, file_path, caption)
+    else:
+        try:
+            upload_photo(bot, update, file_path, caption)
+        except BadRequest:
+            logger.debug("BadRequest caught during upload_photo, falling back to document")
+            upload_document(bot, update, file_path, caption)
+
+
+def get_file(bot, update, args):
+    file_path, caption = get_file_and_caption(update, args)
+    upload_document(bot, update, file_path, caption)
+
+
+@restricted
+@send_action(ChatAction.UPLOAD_DOCUMENT)
+def get_log(bot, update):
+    del bot
+    update.message.reply_document(document=open("log.log", "rb"),
+                                  quote=True)
 
 
 @send_action(ChatAction.TYPING)
@@ -51,6 +78,11 @@ def get_stats(bot, update):
     update.message.reply_text(parse_and_display_stats(LOCAL_DIR, True),
                               parse_mode="Markdown",
                               quote=True)
+
+
+def get_random_file(bot, update):
+    file = random_file(LOCAL_DIR)
+    upload_photo(bot, update, file, get_caption(file.split("/")[-1]))
 
 
 @send_action(ChatAction.UPLOAD_PHOTO)
@@ -100,39 +132,16 @@ def get_file_and_caption(update, args):
     if not found_files:
         update.message.reply_text("No files found for search term '{}'".format(pretty_name),
                                   quote=True)
-        return "", ""
+        return None, None
     else:
         selected_name = found_files[randint(0, len(found_files) - 1)]
         selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
-        caption = "[{0}]({1}{0})".format(selected_name, REMOTE_URL)
+        caption = get_caption(selected_name)
     return selected_file_path, caption
 
 
-def get(bot, update, args):
-    file_path, caption = get_file_and_caption(update, args)
-    if file_path == "" and caption == "":
-        return
-    if (os.path.getsize(file_path)) > PHOTO_SIZE_THRESHOLD:
-        upload_document(bot, update, file_path, caption)
-    else:
-        try:
-            upload_photo(bot, update, file_path, caption)
-        except BadRequest:
-            logger.debug("BadRequest caught during upload_photo, falling back to document")
-            upload_document(bot, update, file_path, caption)
-
-
-def get_file(bot, update, args):
-    file_path, caption = get_file_and_caption(update, args)
-    upload_document(bot, update, file_path, caption)
-
-
-@restricted
-@send_action(ChatAction.UPLOAD_DOCUMENT)
-def get_log(bot, update):
-    del bot
-    update.message.reply_document(document=open("log.log", "rb"),
-                                  quote=True)
+def get_caption(file_name, remote_url=REMOTE_URL):
+    return "[{0}]({1}{0})".format(file_name, remote_url)
 
 
 def configure_logging():
@@ -154,6 +163,7 @@ def main():
     dispatcher.add_handler(CommandHandler("log", get_log))
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("stats", get_stats))
+    dispatcher.add_handler(CommandHandler("random", get_random_file))
     updater.start_polling()
     updater.idle()
 

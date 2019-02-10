@@ -1,13 +1,20 @@
 # pylint: disable=missing-docstring
 
 import math
+import random
 import os
 
 PICTURE_STATS = {}
 
 
-def walk_dir(directory='.', extension='jpg'):
-    total_count = 0
+def get_random_file(directory='.', extension='.jpg'):
+    all_files = list_all_files(directory, extension)
+    total_count = len(all_files)
+    return os.path.join(directory, all_files[random.randint(0, total_count - 1)])
+
+
+def list_all_files(directory='.', extension='jpg'):
+    all_files = []
     extension = extension.lower()
     for _, _, files in os.walk(directory):
         for name in files:
@@ -16,8 +23,8 @@ def walk_dir(directory='.', extension='jpg'):
                 count = sanitized_name.split("_")[-1]
                 model_name = sanitized_name.replace("_{}".format(count), "")
                 PICTURE_STATS[model_name] = PICTURE_STATS.get(model_name, 0) + 1
-                total_count += 1
-    return total_count
+                all_files.append(name)
+    return all_files
 
 
 def convert_size(size_bytes):
@@ -40,7 +47,7 @@ def calc_size(directory='.'):
 
 
 def parse_and_display_stats(directory='.', format_for_telegram=False):
-    total_count = walk_dir(directory)
+    total_count = len(list_all_files(directory))
     final_results = ""
     for key, value in sorted(PICTURE_STATS.items()):
         final_results += "{}: {}\n".format(key.replace("_", " "), value)
