@@ -8,7 +8,7 @@ from random import randint
 
 import pickledb
 from telegram import ChatAction
-from telegram.error import BadRequest
+from telegram.error import BadRequest, TimedOut
 from telegram.ext import Updater, CommandHandler
 
 from decorators import send_action, restricted
@@ -115,32 +115,40 @@ def upload_document(bot, update, file_path, caption):
 @send_action(ChatAction.UPLOAD_PHOTO)
 def upload_photo_internal(bot, update, file, caption, telegram_id=None):
     del bot
-    if telegram_id:
-        update.message.reply_photo(photo=telegram_id,
-                                   caption=caption,
-                                   parse_mode="Markdown",
-                                   quote=True)
-        return None
-    else:
-        return update.message.reply_photo(photo=open(file, "rb"),
-                                          caption=caption,
-                                          parse_mode="Markdown",
-                                          quote=True)
+    try:
+        if telegram_id:
+            update.message.reply_photo(photo=telegram_id,
+                                       caption=caption,
+                                       parse_mode="Markdown",
+                                       quote=True)
+            return None
+        else:
+            return update.message.reply_photo(photo=open(file, "rb"),
+                                              caption=caption,
+                                              parse_mode="Markdown",
+                                              quote=True)
+    except TimedOut:
+        logger.error("Timed out in upload_photo_internal")
+        update.message.reply_text("Timed out.", parse_mode="Markdown")
 
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
 def upload_document_internal(bot, update, file, caption, telegram_id=None):
     del bot
-    if telegram_id:
-        update.message.reply_document(document=telegram_id,
-                                      caption=caption,
-                                      parse_mode="Markdown",
-                                      quote=True)
-    else:
-        return update.message.reply_document(document=open(file, 'rb'),
-                                             caption=caption,
-                                             parse_mode="Markdown",
-                                             quote=True)
+    try:
+        if telegram_id:
+            update.message.reply_document(document=telegram_id,
+                                          caption=caption,
+                                          parse_mode="Markdown",
+                                          quote=True)
+        else:
+            return update.message.reply_document(document=open(file, 'rb'),
+                                                 caption=caption,
+                                                 parse_mode="Markdown",
+                                                 quote=True)
+    except TimedOut:
+        logger.error("Timed out in upload_document_internal")
+        update.message.reply_text("Timed out.", parse_mode="Markdown")
 
 
 def get_file_and_caption(update, args):
