@@ -92,7 +92,13 @@ def populate_cache(bot, update):
         file_hash = md5(file)
         if database.get(file_hash):
             continue
-        upload_photo_internal(bot, update, file, get_caption(get_base_name(file)))
+        message = upload_photo_internal(bot, update, file, get_caption(get_base_name(file)))
+        if message:
+            if message.photo:
+                database.set(file_hash, message.photo[0].file_id)
+            elif message.document:
+                database.set(file_hash, message.document.file_id)
+    update.message.reply_text("Done populating cache, db now has {} entries!".format(database.totalkeys()))
 
 
 def upload_photo(bot, update, file_path, caption):
