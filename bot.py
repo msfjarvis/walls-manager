@@ -100,7 +100,7 @@ def populate_cache(bot, update):
 def upload_photo(bot, update, file_path, caption):
     file_hash = md5(file_path)
     telegram_id = database.get(file_hash)
-    message = upload_photo_internal(bot, update, file_path, telegram_id, caption)
+    message = upload_photo_internal(bot, update, file_path, caption, telegram_id)
     if message:
         database.set(file_hash, message.photo[-1].file_id)
 
