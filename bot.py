@@ -10,6 +10,7 @@ import pickledb
 from telegram import ChatAction
 from telegram.error import BadRequest, TimedOut
 from telegram.ext import Updater, CommandHandler
+from telegram.ext.dispatcher import run_async
 
 from decorators import send_action, restricted
 from file_helpers import find_files, md5, get_base_name
@@ -25,6 +26,7 @@ REMOTE_URL = config["DEST"]["PUBLIC_URL"]
 PHOTO_SIZE_THRESHOLD = 5242880  # 5mB, from Telegram documentation.
 
 
+@run_async
 def get(bot, update, args):
     file_path, caption = get_file_and_caption(update, args)
     if not file_path and not caption:
@@ -35,6 +37,7 @@ def get(bot, update, args):
         upload_photo(bot, update, file_path, caption)
 
 
+@run_async
 def get_file(bot, update, args):
     file_path, caption = get_file_and_caption(update, args)
     upload_document(bot, update, file_path, caption)
@@ -48,6 +51,7 @@ def get_log(bot, update):
                                   quote=True)
 
 
+@run_async
 @send_action(ChatAction.TYPING)
 def search(bot, update, args):
     del bot
@@ -67,6 +71,7 @@ def search(bot, update, args):
                                   quote=True)
 
 
+@run_async
 @restricted
 @send_action(ChatAction.TYPING)
 def get_stats(bot, update):
@@ -75,7 +80,7 @@ def get_stats(bot, update):
                               parse_mode="Markdown",
                               quote=True)
 
-
+@run_async
 def get_random_file(bot, update):
     file = random_file(LOCAL_DIR)
     upload_photo(bot, update, file, get_caption(get_base_name(file)))
