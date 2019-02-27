@@ -112,11 +112,10 @@ def upload_photo_internal(bot, update, file, caption, telegram_id=None):
                                        parse_mode="Markdown",
                                        quote=True)
             return None
-        else:
-            return update.message.reply_photo(photo=open(file, "rb"),
-                                              caption=caption,
-                                              parse_mode="Markdown",
-                                              quote=True)
+        return update.message.reply_photo(photo=open(file, "rb"),
+                                          caption=caption,
+                                          parse_mode="Markdown",
+                                          quote=True)
     except TimedOut:
         logger.error("Timed out in upload_photo_internal")
     except BadRequest:
@@ -144,6 +143,7 @@ def upload_document_internal(bot, update, file, caption, telegram_id=None):
     return None
 
 
+# pylint: disable=inconsistent-return-statements
 def get_file_and_caption(update, args):
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
@@ -153,10 +153,9 @@ def get_file_and_caption(update, args):
         update.message.reply_text("No files found for search term '{}'".format(pretty_name),
                                   quote=True)
         return None, None
-    else:
-        selected_name = found_files[randint(0, len(found_files) - 1)]
-        selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
-        caption = get_caption(selected_name)
+    selected_name = found_files[randint(0, len(found_files) - 1)]
+    selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
+    caption = get_caption(selected_name)
     return selected_file_path, caption
 
 
