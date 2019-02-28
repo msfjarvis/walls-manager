@@ -143,11 +143,10 @@ def upload_document_internal(bot, update, file, caption, telegram_id=None):
     return None
 
 
-# pylint: disable=inconsistent-return-statements
 def get_file_and_caption(update, args):
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
-        return
+        return None, None
     pretty_name, found_files = find_files(args, LOCAL_DIR)
     if not found_files:
         update.message.reply_text("No files found for search term '{}'".format(pretty_name),

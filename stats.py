@@ -55,6 +55,7 @@ def parse_and_display_stats(directory='.', format_for_telegram=False):
     final_results += "\nTotal size: {}".format(calc_size(directory))
     if not format_for_telegram:
         print(final_results)
+        return None
     else:
         return final_results
 

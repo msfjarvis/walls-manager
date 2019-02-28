@@ -18,8 +18,8 @@ def find_files(args, dir_name):
 
 def md5(file_name):
     hash_md5 = hashlib.md5()
-    with open(file_name, "rb") as f:
-        for chunk in iter(lambda: f.read(2 ** 20), b""):
+    with open(file_name, "rb") as full_file:
+        for chunk in iter(lambda: full_file.read(2 ** 20), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 

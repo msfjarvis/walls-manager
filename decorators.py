@@ -27,6 +27,6 @@ def restricted(func):
         user_id = update.effective_user.id
         if user_id not in LIST_OF_ADMINS:
             print("Unauthorized access denied for {}.".format(user_id))
-            return
+            return None
         return func(bot, update, *args, **kwargs)
     return wrapped
