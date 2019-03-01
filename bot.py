@@ -80,6 +80,7 @@ def get_stats(bot, update):
                               parse_mode="Markdown",
                               quote=True)
 
+
 @run_async
 def get_random_file(bot, update):
     file = random_file(LOCAL_DIR)
@@ -94,11 +95,7 @@ def populate_cache(bot, update):
         if database.get(file_hash):
             continue
         message = upload_photo_internal(bot, update, file, get_caption(get_base_name(file)))
-        if message:
-            if message.photo:
-                database.set(file_hash, message.photo[0].file_id)
-            elif message.document:
-                database.set(file_hash, message.document.file_id)
+        add_entry_to_database(file_hash, message)
     update.message.reply_text("Done populating cache, db now has {} entries!".format(database.totalkeys()))
 
 
@@ -106,8 +103,7 @@ def upload_photo(bot, update, file_path, caption):
     file_hash = md5(file_path)
     telegram_id = database.get(file_hash)
     message = upload_photo_internal(bot, update, file_path, caption, telegram_id)
-    if message:
-        database.set(file_hash, message.photo[0].file_id)
+    add_entry_to_database(file_hash, message)
 
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
@@ -115,8 +111,7 @@ def upload_document(bot, update, file_path, caption):
     file_hash = md5(file_path)
     telegram_id = database.get(file_hash)
     message = upload_document_internal(bot, update, file_path, caption, telegram_id)
-    if message:
-        database.set(file_hash, message.document.file_id)
+    add_entry_to_database(file_hash, message)
 
 
 @send_action(ChatAction.UPLOAD_PHOTO)
@@ -157,6 +152,15 @@ def upload_document_internal(bot, update, file, caption, telegram_id=None):
     except TimedOut:
         logger.error("Timed out in upload_document_internal")
     return None
+
+
+def add_entry_to_database(file_hash, message):
+    if not message:
+        logger.debug("NoneType message passed to add_entry_to_database")
+    elif message.document:
+        database.set(file_hash, message.document.file_id)
+    elif message.photo:
+        database.set(file_hash, message.photo[0].file_id)
 
 
 def get_file_and_caption(update, args):
