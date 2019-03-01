@@ -6,6 +6,7 @@ import logging
 import os
 from copy import deepcopy
 from random import randint
+from signal import signal, SIGTERM, SIGINT
 
 import pickledb
 from telegram import ChatAction
@@ -223,7 +224,14 @@ def configure_logging():
                             filename="log.log")
 
 
+def handle_exit(*args):
+    del args
+    database.dump()
+
+
 def main():
+    for sig in (SIGTERM, SIGINT):
+        signal(sig, handle_exit)
     configure_logging()
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
