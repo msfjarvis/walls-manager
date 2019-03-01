@@ -14,7 +14,7 @@ from telegram.ext.dispatcher import run_async
 
 from decorators import send_action, restricted
 from file_helpers import find_files, md5, get_base_name
-from stats import parse_and_display_stats, get_random_file as random_file
+from stats import parse_and_display_stats, list_all_files, get_random_file as random_file
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 database = pickledb.load("tg_file_ids.db", True)  # pylint: disable=invalid-name
@@ -84,6 +84,22 @@ def get_stats(bot, update):
 def get_random_file(bot, update):
     file = random_file(LOCAL_DIR)
     upload_photo(bot, update, file, get_caption(get_base_name(file)))
+
+
+@restricted
+def populate_cache(bot, update):
+    all_files = list_all_files(LOCAL_DIR)
+    for file in iter(all_files):
+        file_hash = md5(file)
+        if database.get(file_hash):
+            continue
+        message = upload_photo_internal(bot, update, file, get_caption(get_base_name(file)))
+        if message:
+            if message.photo:
+                database.set(file_hash, message.photo[0].file_id)
+            elif message.document:
+                database.set(file_hash, message.document.file_id)
+    update.message.reply_text("Done populating cache, db now has {} entries!".format(database.totalkeys()))
 
 
 def upload_photo(bot, update, file_path, caption):
@@ -182,6 +198,7 @@ def main():
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("stats", get_stats))
     dispatcher.add_handler(CommandHandler("random", get_random_file))
+    dispatcher.add_handler(CommandHandler("cache", populate_cache))
     updater.start_polling()
     updater.idle()
 
