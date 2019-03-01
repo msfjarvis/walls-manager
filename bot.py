@@ -4,6 +4,7 @@
 import configparser
 import logging
 import os
+from copy import deepcopy
 from random import randint
 
 import pickledb
@@ -65,9 +66,10 @@ def get_db_stats(bot, update):
 @restricted
 def validate_db_entries(bot, update):
     del update
-    for key in database.getall():
+    db_copy = deepcopy(database)
+    for key in db_copy.getall():
         file_hash = key
-        tg_file_id = database.get(key)
+        tg_file_id = db_copy.get(key)
         try:
             bot.get_file(tg_file_id)
         except TelegramError:
