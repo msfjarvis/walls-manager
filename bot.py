@@ -63,6 +63,7 @@ def get_db_stats(bot, update):
     update.message.reply_text(db_stats, quote=True)
 
 
+@run_async
 @restricted
 def validate_db_entries(bot, update):
     purged_entries = 0
