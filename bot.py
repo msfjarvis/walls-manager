@@ -104,8 +104,8 @@ def populate_cache(bot, update):
     all_files = list_all_files(LOCAL_DIR)
     for file in iter(all_files):
         file_hash = md5(file)
-        if database.get(file_hash):
-            continue
+        if database.exists(file_hash):
+            pass
         message = upload_photo_internal(bot, update, file, get_caption(get_base_name(file)))
         add_entry_to_database(file_hash, message)
     update.message.reply_text("Done populating cache, db now has {} entries!".format(database.totalkeys()))
