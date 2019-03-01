@@ -43,12 +43,23 @@ def get_file(bot, update, args):
     upload_document(bot, update, file_path, caption)
 
 
+@run_async
 @restricted
 @send_action(ChatAction.UPLOAD_DOCUMENT)
 def get_log(bot, update):
     del bot
     update.message.reply_document(document=open("log.log", "rb"),
                                   quote=True)
+
+
+@run_async
+@restricted
+@send_action(ChatAction.TYPING)
+def get_db_stats(bot, update):
+    del bot
+    db_stats = "Database statistics\n\n"
+    db_stats += "Total keys: {}".format(database.totalkeys())
+    update.message.reply_text(db_stats, quote=True)
 
 
 @run_async
@@ -204,6 +215,7 @@ def main():
     dispatcher.add_handler(CommandHandler("stats", get_stats))
     dispatcher.add_handler(CommandHandler("random", get_random_file))
     dispatcher.add_handler(CommandHandler("cache", populate_cache))
+    dispatcher.add_handler(CommandHandler("dbstats", get_db_stats))
     updater.start_polling()
     updater.idle()
 
