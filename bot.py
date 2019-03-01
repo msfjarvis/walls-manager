@@ -87,6 +87,7 @@ def get_random_file(bot, update):
     upload_photo(bot, update, file, get_caption(get_base_name(file)))
 
 
+@run_async
 @restricted
 def populate_cache(bot, update):
     all_files = list_all_files(LOCAL_DIR)
