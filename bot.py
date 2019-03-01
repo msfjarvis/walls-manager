@@ -60,7 +60,7 @@ def get_log(bot, update):
 def get_db_stats(bot, update):
     del bot
     db_stats = "Database statistics\n\n"
-    db_stats += "Total keys: {}".format(database.totalkeys())
+    db_stats += f"Total keys: {database.totalkeys()}"
     update.message.reply_text(db_stats, quote=True)
 
 
@@ -78,7 +78,7 @@ def validate_db_entries(bot, update):
             logger.error("Found missing file, purging from database")
             database.rem(file_hash)
             purged_entries += 1
-    update.message.reply_text("Finished database validation, found {} invalid entries".format(purged_entries),
+    update.message.reply_text(f"Finished database validation, found {purged_entries} invalid entries",
                               quote=True)
 
 
@@ -91,12 +91,12 @@ def search(bot, update, args):
         return
     pretty_name, found_files = find_files(args, LOCAL_DIR)
     if not found_files:
-        update.message.reply_text("No files found for search term '{}'".format(pretty_name),
+        update.message.reply_text(f"No files found for search term '{pretty_name}'",
                                   quote=True)
     else:
-        message = "Results for '{}':\n".format(pretty_name)
+        message = f"Results for '{pretty_name}':\n"
         for item in iter(sorted(found_files)):
-            message += "[{0}]({1}{0})\n".format(item, REMOTE_URL)
+            message += f"[{item}]({REMOTE_URL}{item})\n"
 
         update.message.reply_text(message, "Markdown", disable_web_page_preview=True,
                                   quote=True)
@@ -128,7 +128,7 @@ def populate_cache(bot, update):
             continue
         message = upload_photo_internal(bot, update, file, get_caption(get_base_name(file)))
         add_entry_to_database(file_hash, message)
-    update.message.reply_text("Done populating cache, db now has {} entries!".format(database.totalkeys()))
+    update.message.reply_text(f"Done populating cache, db now has {database.totalkeys()} entries!")
 
 
 def upload_photo(bot, update, file_path, caption):
@@ -201,8 +201,7 @@ def get_file_and_caption(update, args):
         return None, None
     pretty_name, found_files = find_files(args, LOCAL_DIR)
     if not found_files:
-        update.message.reply_text("No files found for search term '{}'".format(pretty_name),
-                                  quote=True)
+        update.message.reply_text(f"No files found for search term '{pretty_name}'", quote=True)
         return None, None
     selected_name = found_files[randint(0, len(found_files) - 1)]
     selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
