@@ -65,7 +65,7 @@ def get_db_stats(bot, update):
 
 @restricted
 def validate_db_entries(bot, update):
-    del update
+    purged_entries = 0
     db_copy = deepcopy(database)
     for key in db_copy.getall():
         file_hash = key
@@ -75,6 +75,9 @@ def validate_db_entries(bot, update):
         except TelegramError:
             logger.error("Found missing file, purging from database")
             database.rem(file_hash)
+            purged_entries += 1
+    update.message.reply_text("Finished database validation, found {} invalid entries".format(purged_entries),
+                              quote=True)
 
 
 @run_async
