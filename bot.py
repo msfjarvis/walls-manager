@@ -8,7 +8,7 @@ from random import randint
 
 import pickledb
 from telegram import ChatAction
-from telegram.error import BadRequest, TimedOut
+from telegram.error import BadRequest, TimedOut, TelegramError
 from telegram.ext import Updater, CommandHandler
 from telegram.ext.dispatcher import run_async
 
@@ -60,6 +60,19 @@ def get_db_stats(bot, update):
     db_stats = "Database statistics\n\n"
     db_stats += "Total keys: {}".format(database.totalkeys())
     update.message.reply_text(db_stats, quote=True)
+
+
+@restricted
+def validate_db_entries(bot, update):
+    del update
+    for key in database.getall():
+        file_hash = key
+        tg_file_id = database.get(key)
+        try:
+            bot.get_file(tg_file_id)
+        except TelegramError:
+            logger.error("Found missing file, purging from database")
+            database.rem(file_hash)
 
 
 @run_async
@@ -216,6 +229,7 @@ def main():
     dispatcher.add_handler(CommandHandler("random", get_random_file))
     dispatcher.add_handler(CommandHandler("cache", populate_cache))
     dispatcher.add_handler(CommandHandler("dbstats", get_db_stats))
+    dispatcher.add_handler(CommandHandler("validate", validate_db_entries))
     updater.start_polling()
     updater.idle()
 
