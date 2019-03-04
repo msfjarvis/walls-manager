@@ -16,6 +16,7 @@ from telegram.ext.dispatcher import run_async
 
 from decorators import send_action, restricted
 from file_helpers import find_files, md5, get_base_name
+from fs_watcher import FSWatcher
 from stats import parse_and_display_stats, list_all_files, get_random_file as random_file
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -243,6 +244,7 @@ def main():
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("stats", get_stats))
     dispatcher.add_handler(CommandHandler("validate", validate_db_entries))
+    FSWatcher(LOCAL_DIR)
     updater.start_polling()
     updater.idle()
 

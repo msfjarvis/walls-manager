@@ -1,3 +1,4 @@
 configparser
 pickledb
 python-telegram-bot
+pyinotify
