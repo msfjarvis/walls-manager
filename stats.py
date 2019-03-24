@@ -7,13 +7,13 @@ import os
 PICTURE_STATS = {}
 
 
-def get_random_file(directory='.', extension='jpg'):
+def get_random_file(directory: str, extension='jpg'):
     all_files = list_all_files(directory, extension)
     total_count = len(all_files)
     return os.path.join(directory, all_files[random.randint(0, total_count - 1)])
 
 
-def list_all_files(directory='.', extension='jpg'):
+def list_all_files(directory: str, extension='jpg'):
     all_files = []
     for _, _, files in os.walk(directory):
         for name in files:
@@ -26,7 +26,7 @@ def list_all_files(directory='.', extension='jpg'):
     return all_files
 
 
-def convert_size(size_bytes):
+def convert_size(size_bytes: int):
     if size_bytes == 0:
         return "0B"
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
@@ -36,7 +36,7 @@ def convert_size(size_bytes):
     return "%s %s" % (size, size_name[index])
 
 
-def calc_size(directory='.'):
+def calc_size(directory: str):
     total_size = 0
     for dirpath, _, files in os.walk(directory):
         for file in files:
@@ -45,7 +45,7 @@ def calc_size(directory='.'):
     return convert_size(total_size)
 
 
-def parse_and_display_stats(directory='.', format_for_telegram=False):
+def parse_and_display_stats(directory: str, format_for_telegram: bool = False):
     total_count = len(list_all_files(directory))
     final_results = ""
     for key, value in sorted(PICTURE_STATS.items()):
