@@ -4,3 +4,4 @@ config.ini
 __pycache__
 log.log
 tg_file_ids.db
+stats.txt
