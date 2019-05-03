@@ -159,11 +159,13 @@ def upload_photo_internal(bot, update, file, caption, telegram_id=None):
                                           caption=caption,
                                           parse_mode="Markdown",
                                           quote=True)
-    except TimedOut:
-        logger.error("Timed out in upload_photo_internal")
     except BadRequest:
         logger.error("BadRequest raised in upload_photo_internal, falling back to document")
         return upload_document_internal(bot, update, file, caption, telegram_id)
+    except TimedOut:
+        logger.error("Timed out in upload_photo_internal")
+    except Exception as e:
+        logger.error(e)
     return None
 
 
@@ -183,6 +185,8 @@ def upload_document_internal(bot, update, file, caption, telegram_id=None):
                                                  quote=True)
     except TimedOut:
         logger.error("Timed out in upload_document_internal")
+    except Exception as e:
+        logger.error(e)
     return None
 
 
