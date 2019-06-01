@@ -9,7 +9,7 @@ from string_helpers import capitalize
 def find_files(args, dir_name):
     args_copy = []
     for arg in iter(args):
-        args_copy.append(capitalize(arg))
+        args_copy.append(capitalize(arg.lower()))
     name = "_".join(args_copy)
     pretty_name = " ".join(args)
     found_files = search_files(name, dir_name)
