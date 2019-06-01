@@ -59,13 +59,13 @@ def sync_to_local(remote_dir: str, local_dir: str):
     rsyncproc.wait()
 
 
-def print_names(base_url: str, file_name: str, is_markdown: bool):
+def print_names(base_url: str, file_name: str, is_markdown: bool) -> str:
     if is_markdown:
         return "[{}]({})".format(file_name, base_url + (file_name.replace(" ", "_")) + ".jpg")
     return file_name
 
 
-def extract_pretty_name(rsync_output_line: str):
+def extract_pretty_name(rsync_output_line: str) -> str:
     return rsync_output_line.split()[1].replace("_", " ").replace(".jpg", "")
 
 
