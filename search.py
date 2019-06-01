@@ -2,10 +2,10 @@
 # pylint: disable=missing-docstring
 
 import os
-from typing import Optional
+from typing import List, Optional
 
 
-def search_files(file_name: str, directory: str = '.') -> Optional[list[str]]:
+def search_files(file_name: str, directory: str = '.') -> Optional[List[str]]:
     found_files = []
     for _, _, files in os.walk(directory):
         for name in files:
