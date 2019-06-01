@@ -4,6 +4,7 @@ import math
 import pickle
 import random
 import os
+from typing import List, Optional
 
 
 def get_stats() -> dict:
@@ -18,13 +19,13 @@ def save_stats(stats: dict):
         pickle.dump(stats, f)
 
 
-def get_random_file(directory: str, extension='jpg'):
+def get_random_file(directory: str, extension: str = 'jpg') -> str:
     all_files = list_all_files(directory, extension)
     total_count = len(all_files)
     return os.path.join(directory, all_files[random.randint(0, total_count - 1)])
 
 
-def list_all_files(directory: str, extension='jpg'):
+def list_all_files(directory: str, extension: str = 'jpg') -> List[str]:
     all_files = []
     picture_stats = {}
     for _, _, files in os.walk(directory):
@@ -42,7 +43,7 @@ def list_all_files(directory: str, extension='jpg'):
     return all_files
 
 
-def convert_size(size_bytes: int):
+def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
         return "0B"
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
@@ -52,7 +53,7 @@ def convert_size(size_bytes: int):
     return "%s %s" % (size, size_name[index])
 
 
-def calc_size(directory: str):
+def calc_size(directory: str) -> str:
     total_size = 0
     for dirpath, _, files in os.walk(directory):
         for file in files:
@@ -61,7 +62,7 @@ def calc_size(directory: str):
     return convert_size(total_size)
 
 
-def parse_and_display_stats(directory: str, format_for_telegram: bool = False):
+def parse_and_display_stats(directory: str, format_for_telegram: bool = False) -> Optional[str]:
     total_count = len(list_all_files(directory))
     final_results = ""
     stats = get_stats()

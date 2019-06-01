@@ -4,9 +4,10 @@ import hashlib
 
 from search import search_files
 from string_helpers import capitalize
+from typing import List
 
 
-def find_files(args, dir_name):
+def find_files(args: List[str], dir_name: str):
     args_copy = []
     for arg in iter(args):
         args_copy.append(capitalize(arg.lower()))
@@ -16,7 +17,7 @@ def find_files(args, dir_name):
     return pretty_name, found_files
 
 
-def md5(file_name):
+def md5(file_name: str):
     hash_md5 = hashlib.md5()
     with open(file_name, "rb") as full_file:
         for chunk in iter(lambda: full_file.read(2 ** 20), b""):
@@ -24,5 +25,5 @@ def md5(file_name):
     return hash_md5.hexdigest()
 
 
-def get_base_name(file_path):
+def get_base_name(file_path: str):
     return file_path.split("/")[-1]

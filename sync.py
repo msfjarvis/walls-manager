@@ -3,7 +3,7 @@
 import subprocess
 
 
-def sync_to_remote(remote_dirs, local_dir, markdown_output, remote_url):
+def sync_to_remote(remote_dirs: str, local_dir: str, markdown_output: bool, remote_url: str):
     printed_stats = False
     for item in remote_dirs.split(","):
         rsynccmd = "rsync -av --progress --delete --itemize-changes {} {}".format(local_dir, item)
@@ -38,7 +38,7 @@ def sync_to_remote(remote_dirs, local_dir, markdown_output, remote_url):
             printed_stats = True
 
 
-def sync_to_local(remote_dir, local_dir):
+def sync_to_local(remote_dir: str, local_dir: str):
     rsynccmd = "rsync -av --progress --delete --itemize-changes {} {}".format(remote_dir, local_dir)
     rsyncproc = subprocess.Popen(rsynccmd,
                                  shell=True,
@@ -59,13 +59,13 @@ def sync_to_local(remote_dir, local_dir):
     rsyncproc.wait()
 
 
-def print_names(base_url, file_name, is_markdown):
+def print_names(base_url: str, file_name: str, is_markdown: bool):
     if is_markdown:
         return "[{}]({})".format(file_name, base_url + (file_name.replace(" ", "_")) + ".jpg")
     return file_name
 
 
-def extract_pretty_name(rsync_output_line):
+def extract_pretty_name(rsync_output_line: str):
     return rsync_output_line.split()[1].replace("_", " ").replace(".jpg", "")
 
 

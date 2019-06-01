@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 # pylint: disable=missing-docstring
 
-import configparser
 import logging
 import os
 from copy import deepcopy
 from random import randint
 from signal import signal, SIGTERM, SIGINT
+from typing import List, Any, Union
 
+import configparser
 import pickledb
-from telegram import ChatAction
+from telegram import ChatAction, Message, Bot, Update
 from telegram.error import BadRequest, TimedOut, TelegramError
 from telegram.ext import Updater, CommandHandler
 from telegram.ext.dispatcher import run_async
@@ -29,7 +30,7 @@ PHOTO_SIZE_THRESHOLD = 5242880  # 5mB, from Telegram documentation.
 
 
 @run_async
-def get(bot, update, args):
+def get(bot: Bot, update: Update, args: List[str]):
     file_path, caption = get_file_and_caption(update, args)
     if not file_path and not caption:
         return
@@ -40,7 +41,7 @@ def get(bot, update, args):
 
 
 @run_async
-def get_file(bot, update, args):
+def get_file(bot: Bot, update: Update, args: List[str]):
     file_path, caption = get_file_and_caption(update, args)
     upload_document(bot, update, file_path, caption)
 
@@ -48,7 +49,7 @@ def get_file(bot, update, args):
 @run_async
 @restricted
 @send_action(ChatAction.UPLOAD_DOCUMENT)
-def get_log(bot, update):
+def get_log(bot: Bot, update: Update):
     del bot
     update.message.reply_document(document=open("log.log", "rb"),
                                   quote=True)
@@ -57,7 +58,7 @@ def get_log(bot, update):
 @run_async
 @restricted
 @send_action(ChatAction.TYPING)
-def get_db_stats(bot, update):
+def get_db_stats(bot: Bot, update: Update):
     del bot
     db_stats = "Database statistics\n\n"
     db_stats += f"Total keys: {database.totalkeys()}"
@@ -66,7 +67,7 @@ def get_db_stats(bot, update):
 
 @run_async
 @restricted
-def validate_db_entries(bot, update):
+def validate_db_entries(bot: Bot, update: Update):
     purged_entries = 0
     db_copy = deepcopy(database)
     for key in db_copy.getall():
@@ -84,7 +85,7 @@ def validate_db_entries(bot, update):
 
 @run_async
 @send_action(ChatAction.TYPING)
-def search(bot, update, args):
+def search(bot: Bot, update: Update, args: List[str]):
     del bot
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
@@ -105,7 +106,7 @@ def search(bot, update, args):
 @run_async
 @restricted
 @send_action(ChatAction.TYPING)
-def get_stats(bot, update):
+def get_stats(bot: Bot, update: Update):
     del bot
     update.message.reply_text(parse_and_display_stats(LOCAL_DIR, True),
                               parse_mode="Markdown",
@@ -113,14 +114,14 @@ def get_stats(bot, update):
 
 
 @run_async
-def get_random_file(bot, update):
+def get_random_file(bot: Bot, update: Update):
     file = random_file(LOCAL_DIR)
     upload_photo(bot, update, file, get_caption(get_base_name(file)))
 
 
 @run_async
 @restricted
-def populate_cache(bot, update):
+def populate_cache(bot: Bot, update: Update):
     all_files = list_all_files(LOCAL_DIR)
     for file in all_files:
         file_hash = md5(file)
@@ -131,7 +132,7 @@ def populate_cache(bot, update):
     update.message.reply_text(f"Done populating cache, db now has {database.totalkeys()} entries!")
 
 
-def upload_photo(bot, update, file_path, caption):
+def upload_photo(bot: Bot, update: Update, file_path: str, caption: str):
     file_hash = md5(file_path)
     telegram_id = database.get(file_hash)
     message = upload_photo_internal(bot, update, file_path, caption, telegram_id)
@@ -139,7 +140,7 @@ def upload_photo(bot, update, file_path, caption):
 
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
-def upload_document(bot, update, file_path, caption):
+def upload_document(bot: Bot, update: Update, file_path: str, caption: str):
     file_hash = md5(file_path)
     telegram_id = database.get(file_hash)
     message = upload_document_internal(bot, update, file_path, caption, telegram_id)
@@ -147,7 +148,7 @@ def upload_document(bot, update, file_path, caption):
 
 
 @send_action(ChatAction.UPLOAD_PHOTO)
-def upload_photo_internal(bot, update, file, caption, telegram_id=None):
+def upload_photo_internal(bot: Bot, update: Update, file: str, caption: str, telegram_id: str = None):
     try:
         if telegram_id:
             update.message.reply_photo(photo=telegram_id,
@@ -170,7 +171,7 @@ def upload_photo_internal(bot, update, file, caption, telegram_id=None):
 
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
-def upload_document_internal(bot, update, file, caption, telegram_id=None):
+def upload_document_internal(bot: Bot, update: Update, file: str, caption: str, telegram_id: str = None):
     del bot
     try:
         if telegram_id:
@@ -190,7 +191,7 @@ def upload_document_internal(bot, update, file, caption, telegram_id=None):
     return None
 
 
-def add_entry_to_database(file_hash, message):
+def add_entry_to_database(file_hash: str, message: Message):
     if not message:
         logger.debug("NoneType message passed to add_entry_to_database")
     elif message.document:
@@ -199,7 +200,7 @@ def add_entry_to_database(file_hash, message):
         database.set(file_hash, message.photo[0].file_id)
 
 
-def get_file_and_caption(update, args):
+def get_file_and_caption(update: Update, args: List[str]):
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
         return None, None
@@ -213,7 +214,7 @@ def get_file_and_caption(update, args):
     return selected_file_path, caption
 
 
-def get_caption(file_name, remote_url=REMOTE_URL):
+def get_caption(file_name: str, remote_url: str = REMOTE_URL):
     return "[{0}]({1}{0})".format(file_name, remote_url)
 
 
@@ -227,7 +228,7 @@ def configure_logging():
                             filename="log.log")
 
 
-def handle_exit(*args):
+def handle_exit(args: Union[int, Any]):
     del args
     database.dump()
 
