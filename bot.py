@@ -6,7 +6,7 @@ import os
 from copy import deepcopy
 from random import randint
 from signal import signal, SIGTERM, SIGINT
-from typing import List, Any, Union
+from typing import List, Any, Union, Optional, Tuple
 
 import configparser
 import pickledb
@@ -148,7 +148,13 @@ def upload_document(bot: Bot, update: Update, file_path: str, caption: str):
 
 
 @send_action(ChatAction.UPLOAD_PHOTO)
-def upload_photo_internal(bot: Bot, update: Update, file: str, caption: str, telegram_id: str = None):
+def upload_photo_internal(
+        bot: Bot,
+        update: Update,
+        file: str,
+        caption: str,
+        telegram_id: str = None
+) -> Optional[Message]:
     try:
         if telegram_id:
             update.message.reply_photo(photo=telegram_id,
@@ -171,7 +177,12 @@ def upload_photo_internal(bot: Bot, update: Update, file: str, caption: str, tel
 
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
-def upload_document_internal(bot: Bot, update: Update, file: str, caption: str, telegram_id: str = None):
+def upload_document_internal(
+        bot: Bot,
+        update: Update,
+        file: str,
+        caption: str, telegram_id: str = None
+) -> Optional[Message]:
     del bot
     try:
         if telegram_id:
@@ -179,6 +190,7 @@ def upload_document_internal(bot: Bot, update: Update, file: str, caption: str, 
                                           caption=caption,
                                           parse_mode="Markdown",
                                           quote=True)
+            return None
         else:
             return update.message.reply_document(document=open(file, 'rb'),
                                                  caption=caption,
@@ -200,7 +212,7 @@ def add_entry_to_database(file_hash: str, message: Message):
         database.set(file_hash, message.photo[0].file_id)
 
 
-def get_file_and_caption(update: Update, args: List[str]):
+def get_file_and_caption(update: Update, args: List[str]) -> Tuple[Optional[str], Optional[str]]:
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
         return None, None
@@ -214,7 +226,7 @@ def get_file_and_caption(update: Update, args: List[str]):
     return selected_file_path, caption
 
 
-def get_caption(file_name: str, remote_url: str = REMOTE_URL):
+def get_caption(file_name: str, remote_url: str = REMOTE_URL) -> str:
     return "[{0}]({1}{0})".format(file_name, remote_url)
 
 
