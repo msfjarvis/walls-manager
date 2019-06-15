@@ -10,10 +10,10 @@ from typing import List
 def find_files(args: List[str], dir_name: str):
     args_copy = []
     for arg in iter(args):
-        args_copy.append(capitalize(arg.lower()))
+        args_copy.append(capitalize(arg))
     name = "_".join(args_copy)
     pretty_name = " ".join(args)
-    found_files = search_files(name, dir_name)
+    found_files = search_files(name.lower(), dir_name)
     return pretty_name, found_files
 
 
