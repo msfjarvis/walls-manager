@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 # pylint: disable=missing-docstring
 
+import configparser
 import logging
 import os
-from copy import deepcopy
 from random import randint
 from signal import signal, SIGTERM, SIGINT
 from typing import List, Any, Union, Optional, Tuple
 
-import configparser
 import pickledb
 from telegram import ChatAction, Message, Bot, Update
-from telegram.error import BadRequest, TimedOut, TelegramError
+from telegram.error import BadRequest, TimedOut
 from telegram.ext import Updater, CommandHandler
 from telegram.ext.dispatcher import run_async
 
@@ -63,24 +62,6 @@ def get_db_stats(bot: Bot, update: Update):
     db_stats = "Database statistics\n\n"
     db_stats += f"Total keys: {database.totalkeys()}"
     update.message.reply_text(db_stats, quote=True)
-
-
-@run_async
-@restricted
-def validate_db_entries(bot: Bot, update: Update):
-    purged_entries = 0
-    db_copy = deepcopy(database)
-    for key in db_copy.getall():
-        file_hash = key
-        tg_file_id = db_copy.get(key)
-        try:
-            bot.get_file(tg_file_id)
-        except TelegramError:
-            logger.error("Found missing file, purging from database")
-            database.rem(file_hash)
-            purged_entries += 1
-    update.message.reply_text(f"Finished database validation, found {purged_entries} invalid entries",
-                              quote=True)
 
 
 @run_async
@@ -259,7 +240,6 @@ def main():
     dispatcher.add_handler(CommandHandler("random", get_random_file))
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("stats", get_stats))
-    dispatcher.add_handler(CommandHandler("validate", validate_db_entries))
     updater.start_polling()
     updater.idle()
 
