@@ -228,8 +228,11 @@ def main():
     dispatcher.add_handler(CommandHandler("random", get_random_file))
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("stats", get_stats))
-    updater.bot.set_webhook(url=f'{WEBHOOK_URL}/{WEBHOOK_TOKEN}')
-    updater.start_webhook(listen='127.0.0.1', port=5000, url_path=WEBHOOK_TOKEN)
+    if not os.getenv("DEBUG", None):
+        updater.bot.set_webhook(url=f'{webhook_url}/{webhook_token}')
+        updater.start_webhook(listen='127.0.0.1', port=5000, url_path=webhook_token)
+    else:
+        updater.start_polling()
     updater.idle()
 
 
