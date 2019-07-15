@@ -22,9 +22,6 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 database = pickledb.load("tg_file_ids.db", True)  # pylint: disable=invalid-name
 config = configparser.ConfigParser()  # pylint: disable=invalid-name
 config.read("config.ini")
-TOKEN = config["BOT"]["TOKEN"]
-WEBHOOK_TOKEN = config["BOT"]["WEBHOOK_TOKEN"]
-WEBHOOK_URL = config["BOT"]["WEBHOOK_URL"]
 LOCAL_DIR = config["SOURCE"]["DIR"]
 REMOTE_URL = config["DEST"]["PUBLIC_URL"]
 PHOTO_SIZE_THRESHOLD = 5242880  # 5mB, from Telegram documentation.
@@ -219,7 +216,7 @@ def main():
     for sig in (SIGTERM, SIGINT):
         signal(sig, handle_exit)
     configure_logging()
-    updater = Updater(TOKEN)
+    updater = Updater(config["BOT"]["TOKEN"])
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler("dbstats", get_db_stats))
     dispatcher.add_handler(CommandHandler("getfile", get_file, pass_args=True))
@@ -229,6 +226,8 @@ def main():
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("stats", get_stats))
     if not os.getenv("DEBUG", None):
+        webhook_token: str = config["BOT"]["WEBHOOK_TOKEN"]
+        webhook_url: str = config["BOT"]["WEBHOOK_URL"]
         updater.bot.set_webhook(url=f'{webhook_url}/{webhook_token}')
         updater.start_webhook(listen='127.0.0.1', port=5000, url_path=webhook_token)
     else:
