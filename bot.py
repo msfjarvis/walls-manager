@@ -99,14 +99,21 @@ def get_random_file(bot: Bot, update: Update):
     upload_photo(bot, update, file, get_caption(get_base_name(file)))
 
 
-@run_async
 @restricted
-def populate_cache(bot: Bot, update: Update):
+def populate_cache(bot: Bot, update: Update, args: List[str]):
+    max_cnt = 50
+    if len(args) == 1 and args[0].isnumeric():
+        max_cnt = int(args[0])
+    idx = 0
     all_files = list_all_files(LOCAL_DIR)
+    update.message.reply_text(f"Database current has {database.totalkeys()} keys. Caching {max_cnt} more...")
     for file in all_files:
+        if idx == max_cnt:
+            break
         file_hash = md5(file)
         if database.exists(file_hash):
             continue
+        idx += 1
         message = upload_photo_internal(bot, update, file, get_caption(get_base_name(file)))
         add_entry_to_database(file_hash, message)
     update.message.reply_text(f"Done populating cache, db now has {database.totalkeys()} entries!")
@@ -231,7 +238,7 @@ def main():
     configure_logging()
     updater = Updater(config["BOT"]["TOKEN"])
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler("cache", populate_cache))
+    dispatcher.add_handler(CommandHandler("cache", populate_cache, pass_args=True))
     dispatcher.add_handler(CommandHandler("dbstats", get_db_stats))
     dispatcher.add_handler(CommandHandler("getfile", get_file, pass_args=True))
     dispatcher.add_handler(CommandHandler("log", get_log))
