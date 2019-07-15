@@ -8,5 +8,7 @@ PUBLIC_URL=https://domain.tld/folder/
 
 [BOT]
 TOKEN=th1s1sd3f1n1t3lyn0th0wt0k3nsl00kl1k3:1239574
+WEBHOOK_URL=https://example.com
+WEBHOOK_TOKEN=c4nb3anyth1ngy0uw4nt
 # The ID of the owner
 MASTER=123456789

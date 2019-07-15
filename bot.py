@@ -23,6 +23,8 @@ database = pickledb.load("tg_file_ids.db", True)  # pylint: disable=invalid-name
 config = configparser.ConfigParser()  # pylint: disable=invalid-name
 config.read("config.ini")
 TOKEN = config["BOT"]["TOKEN"]
+WEBHOOK_TOKEN = config["BOT"]["WEBHOOK_TOKEN"]
+WEBHOOK_URL = config["BOT"]["WEBHOOK_URL"]
 LOCAL_DIR = config["SOURCE"]["DIR"]
 REMOTE_URL = config["DEST"]["PUBLIC_URL"]
 PHOTO_SIZE_THRESHOLD = 5242880  # 5mB, from Telegram documentation.
@@ -226,7 +228,8 @@ def main():
     dispatcher.add_handler(CommandHandler("random", get_random_file))
     dispatcher.add_handler(CommandHandler("search", search, pass_args=True))
     dispatcher.add_handler(CommandHandler("stats", get_stats))
-    updater.start_polling()
+    updater.bot.set_webhook(url=f'{WEBHOOK_URL}/{WEBHOOK_TOKEN}')
+    updater.start_webhook(listen='127.0.0.1', port=5000, url_path=WEBHOOK_TOKEN)
     updater.idle()
 
 
