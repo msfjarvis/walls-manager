@@ -106,7 +106,7 @@ def populate_cache(bot: Bot, update: Update, args: List[str]):
         max_cnt = int(args[0])
     idx = 0
     all_files = list_all_files(LOCAL_DIR)
-    update.message.reply_text(f"Database current has {database.totalkeys()} keys. Caching {max_cnt} more...")
+    update.message.reply_text(f"Database currently has {database.totalkeys()} keys. Caching {max_cnt} more...")
     for file in all_files:
         if idx == max_cnt:
             break
