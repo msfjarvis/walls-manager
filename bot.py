@@ -16,7 +16,11 @@ from telegram.ext.dispatcher import run_async
 
 from decorators import send_action, restricted
 from file_helpers import find_files, md5, get_base_name
-from stats import parse_and_display_stats, list_all_files, get_random_file as random_file
+from stats import (
+    parse_and_display_stats,
+    list_all_files,
+    get_random_file as random_file,
+)
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 database = pickledb.load("tg_file_ids.db", True)  # pylint: disable=invalid-name
@@ -49,8 +53,7 @@ def get_file(bot: Bot, update: Update, args: List[str]):
 @send_action(ChatAction.UPLOAD_DOCUMENT)
 def get_log(bot: Bot, update: Update):
     del bot
-    update.message.reply_document(document=open("log.log", "rb"),
-                                  quote=True)
+    update.message.reply_document(document=open("log.log", "rb"), quote=True)
 
 
 @run_async
@@ -72,15 +75,17 @@ def search(bot: Bot, update: Update, args: List[str]):
         return
     pretty_name, found_files = find_files(args, LOCAL_DIR)
     if not found_files:
-        update.message.reply_text(f"No files found for search term '{pretty_name}'",
-                                  quote=True)
+        update.message.reply_text(
+            f"No files found for search term '{pretty_name}'", quote=True
+        )
     else:
         message = f"Results for '{pretty_name}':\n"
         for item in iter(sorted(found_files)):
             message += f"[{item}]({REMOTE_URL}{item})\n"
 
-        update.message.reply_text(message, "Markdown", disable_web_page_preview=True,
-                                  quote=True)
+        update.message.reply_text(
+            message, "Markdown", disable_web_page_preview=True, quote=True
+        )
 
 
 @run_async
@@ -88,9 +93,9 @@ def search(bot: Bot, update: Update, args: List[str]):
 @send_action(ChatAction.TYPING)
 def get_stats(bot: Bot, update: Update):
     del bot
-    update.message.reply_text(parse_and_display_stats(LOCAL_DIR, True),
-                              parse_mode="Markdown",
-                              quote=True)
+    update.message.reply_text(
+        parse_and_display_stats(LOCAL_DIR, True), parse_mode="Markdown", quote=True
+    )
 
 
 @run_async
@@ -106,7 +111,9 @@ def populate_cache(bot: Bot, update: Update, args: List[str]):
         max_cnt = int(args[0])
     idx = 0
     all_files = list_all_files(LOCAL_DIR)
-    update.message.reply_text(f"Database currently has {database.totalkeys()} keys. Caching {max_cnt} more...")
+    update.message.reply_text(
+        f"Database currently has {database.totalkeys()} keys. Caching {max_cnt} more..."
+    )
     for file in all_files:
         if idx == max_cnt:
             break
@@ -114,9 +121,13 @@ def populate_cache(bot: Bot, update: Update, args: List[str]):
         if database.exists(file_hash):
             continue
         idx += 1
-        message = upload_photo_internal(bot, update, file, get_caption(get_base_name(file)))
+        message = upload_photo_internal(
+            bot, update, file, get_caption(get_base_name(file))
+        )
         add_entry_to_database(file_hash, message)
-    update.message.reply_text(f"Done populating cache, db now has {database.totalkeys()} entries!")
+    update.message.reply_text(
+        f"Done populating cache, db now has {database.totalkeys()} entries!"
+    )
 
 
 def upload_photo(bot: Bot, update: Update, file_path: str, caption: str):
@@ -136,25 +147,21 @@ def upload_document(bot: Bot, update: Update, file_path: str, caption: str):
 
 @send_action(ChatAction.UPLOAD_PHOTO)
 def upload_photo_internal(
-        bot: Bot,
-        update: Update,
-        file: str,
-        caption: str,
-        telegram_id: str = None
+    bot: Bot, update: Update, file: str, caption: str, telegram_id: str = None
 ) -> Optional[Message]:
     try:
         if telegram_id:
-            update.message.reply_photo(photo=telegram_id,
-                                       caption=caption,
-                                       parse_mode="Markdown",
-                                       quote=True)
+            update.message.reply_photo(
+                photo=telegram_id, caption=caption, parse_mode="Markdown", quote=True
+            )
             return None
-        return update.message.reply_photo(photo=open(file, "rb"),
-                                          caption=caption,
-                                          parse_mode="Markdown",
-                                          quote=True)
+        return update.message.reply_photo(
+            photo=open(file, "rb"), caption=caption, parse_mode="Markdown", quote=True
+        )
     except BadRequest:
-        logger.error("BadRequest raised in upload_photo_internal, falling back to document")
+        logger.error(
+            "BadRequest raised in upload_photo_internal, falling back to document"
+        )
         return upload_document_internal(bot, update, file, caption, telegram_id)
     except TimedOut:
         logger.error("Timed out in upload_photo_internal")
@@ -165,24 +172,22 @@ def upload_photo_internal(
 
 @send_action(ChatAction.UPLOAD_DOCUMENT)
 def upload_document_internal(
-        bot: Bot,
-        update: Update,
-        file: str,
-        caption: str, telegram_id: str = None
+    bot: Bot, update: Update, file: str, caption: str, telegram_id: str = None
 ) -> Optional[Message]:
     del bot
     try:
         if telegram_id:
-            update.message.reply_document(document=telegram_id,
-                                          caption=caption,
-                                          parse_mode="Markdown",
-                                          quote=True)
+            update.message.reply_document(
+                document=telegram_id, caption=caption, parse_mode="Markdown", quote=True
+            )
             return None
         else:
-            return update.message.reply_document(document=open(file, 'rb'),
-                                                 caption=caption,
-                                                 parse_mode="Markdown",
-                                                 quote=True)
+            return update.message.reply_document(
+                document=open(file, "rb"),
+                caption=caption,
+                parse_mode="Markdown",
+                quote=True,
+            )
     except TimedOut:
         logger.error("Timed out in upload_document_internal")
     except Exception as e:
@@ -199,16 +204,20 @@ def add_entry_to_database(file_hash: str, message: Message):
         database.set(file_hash, message.photo[0].file_id)
 
 
-def get_file_and_caption(update: Update, args: List[str]) -> Tuple[Optional[str], Optional[str]]:
+def get_file_and_caption(
+    update: Update, args: List[str]
+) -> Tuple[Optional[str], Optional[str]]:
     if not args:
         update.message.reply_text("Please specify who to search for!", quote=True)
         return None, None
     pretty_name, found_files = find_files(args, LOCAL_DIR)
     if not found_files:
-        update.message.reply_text(f"No files found for search term '{pretty_name}'", quote=True)
+        update.message.reply_text(
+            f"No files found for search term '{pretty_name}'", quote=True
+        )
         return None, None
     selected_name = found_files[randint(0, len(found_files) - 1)]
-    selected_file_path = '{}/{}'.format(LOCAL_DIR, selected_name)
+    selected_file_path = "{}/{}".format(LOCAL_DIR, selected_name)
     caption = get_caption(selected_name)
     return selected_file_path, caption
 
@@ -219,12 +228,16 @@ def get_caption(file_name: str, remote_url: str = REMOTE_URL) -> str:
 
 def configure_logging():
     if os.getenv("DEBUG", "") != "":
-        logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                            level=logging.DEBUG)
+        logging.basicConfig(
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            level=logging.DEBUG,
+        )
     else:
-        logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                            level=logging.DEBUG,
-                            filename="log.log")
+        logging.basicConfig(
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            level=logging.DEBUG,
+            filename="log.log",
+        )
 
 
 def handle_exit(args: Union[int, Any]):
@@ -249,12 +262,12 @@ def main():
     if not os.getenv("DEBUG", None):
         webhook_token: str = config["BOT"]["WEBHOOK_TOKEN"]
         webhook_url: str = config["BOT"]["WEBHOOK_URL"]
-        updater.bot.set_webhook(url=f'{webhook_url}/{webhook_token}')
-        updater.start_webhook(listen='127.0.0.1', port=5000, url_path=webhook_token)
+        updater.bot.set_webhook(url=f"{webhook_url}/{webhook_token}")
+        updater.start_webhook(listen="127.0.0.1", port=5000, url_path=webhook_token)
     else:
         updater.start_polling()
     updater.idle()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

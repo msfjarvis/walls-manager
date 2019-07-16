@@ -5,7 +5,7 @@ import os
 from typing import List
 
 
-def search_files(file_name: str, directory: str = '.') -> List[str]:
+def search_files(file_name: str, directory: str = ".") -> List[str]:
     found_files = []
     for _, _, files in os.walk(directory):
         for name in files:

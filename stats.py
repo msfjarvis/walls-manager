@@ -19,13 +19,13 @@ def save_stats(stats: dict):
         pickle.dump(stats, f)
 
 
-def get_random_file(directory: str, extension: str = 'jpg') -> str:
+def get_random_file(directory: str, extension: str = "jpg") -> str:
     all_files = list_all_files(directory, extension)
     total_count = len(all_files)
     return os.path.join(directory, all_files[random.randint(0, total_count - 1)])
 
 
-def list_all_files(directory: str, extension: str = 'jpg') -> List[str]:
+def list_all_files(directory: str, extension: str = "jpg") -> List[str]:
     all_files = []
     picture_stats = {}
     for _, _, files in os.walk(directory):
@@ -62,7 +62,9 @@ def calc_size(directory: str) -> str:
     return convert_size(total_size)
 
 
-def parse_and_display_stats(directory: str, format_for_telegram: bool = False) -> Optional[str]:
+def parse_and_display_stats(
+    directory: str, format_for_telegram: bool = False
+) -> Optional[str]:
     total_count = len(list_all_files(directory))
     final_results = ""
     stats = get_stats()
@@ -78,6 +80,6 @@ def parse_and_display_stats(directory: str, format_for_telegram: bool = False) -
         return final_results
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("This script is not intended to be used by itself, use manager.py!")
     exit(1)

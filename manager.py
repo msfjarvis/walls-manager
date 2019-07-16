@@ -16,13 +16,25 @@ LOCAL_DIR = config["SOURCE"]["DIR"]
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--details", help="List statistics of local directory",
-                        action="store_true")
-    parser.add_argument("-m", "--markdown", help="Output file names as Markdown links",
-                        action="store_true", default=True)
-    parser.add_argument("-s", "--sync",
-                        help="Set direction of sync, local for pull and remote for push",
-                        type=str)
+    parser.add_argument(
+        "-d",
+        "--details",
+        help="List statistics of local directory",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-m",
+        "--markdown",
+        help="Output file names as Markdown links",
+        action="store_true",
+        default=True,
+    )
+    parser.add_argument(
+        "-s",
+        "--sync",
+        help="Set direction of sync, local for pull and remote for push",
+        type=str,
+    )
     args = parser.parse_args()
 
     if args.sync and args.sync == "remote":
@@ -33,12 +45,12 @@ def main():
         # We choose the first in the REMOTE_DIRS to be our primary and reliable
         # mirror, then append a trailing slash, and remove the same slash
         # from the local directory. Gotta love rsync.
-        sync_to_local(REMOTE_DIRS.split(",")[0] + '/', LOCAL_DIR[0:-1])
+        sync_to_local(REMOTE_DIRS.split(",")[0] + "/", LOCAL_DIR[0:-1])
     elif args.details:
         parse_and_display_stats(LOCAL_DIR)
     else:
         parser.print_help()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
