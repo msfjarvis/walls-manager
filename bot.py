@@ -16,11 +16,7 @@ from telegram.ext.dispatcher import run_async
 
 from decorators import send_action, restricted
 from file_helpers import find_files, md5, get_base_name
-from stats import (
-    parse_and_display_stats,
-    list_all_files,
-    get_random_file as random_file,
-)
+from stats import parse_and_display_stats, get_random_file as random_file
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 database = pickledb.load("tg_file_ids.db", True)  # pylint: disable=invalid-name
@@ -102,32 +98,6 @@ def get_stats(bot: Bot, update: Update):
 def get_random_file(bot: Bot, update: Update):
     file = random_file(LOCAL_DIR)
     upload_photo(bot, update, file, get_caption(get_base_name(file)))
-
-
-@restricted
-def populate_cache(bot: Bot, update: Update, args: List[str]):
-    max_cnt = 50
-    if len(args) == 1 and args[0].isnumeric():
-        max_cnt = int(args[0])
-    idx = 0
-    all_files = list_all_files(LOCAL_DIR)[::-1]
-    update.message.reply_text(
-        f"Database currently has {database.totalkeys()} keys. Caching {max_cnt} more..."
-    )
-    for file in all_files:
-        if idx == max_cnt:
-            break
-        file_hash = md5(file)
-        if database.exists(file_hash):
-            continue
-        idx += 1
-        message = upload_photo_internal(
-            bot, update, file, get_caption(get_base_name(file))
-        )
-        add_entry_to_database(file_hash, message)
-    update.message.reply_text(
-        f"Done populating cache, db now has {database.totalkeys()} entries!"
-    )
 
 
 def upload_photo(bot: Bot, update: Update, file_path: str, caption: str):
@@ -251,7 +221,6 @@ def main():
     configure_logging()
     updater = Updater(config["BOT"]["TOKEN"])
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler("cache", populate_cache, pass_args=True))
     dispatcher.add_handler(CommandHandler("dbstats", get_db_stats))
     dispatcher.add_handler(CommandHandler("getfile", get_file, pass_args=True))
     dispatcher.add_handler(CommandHandler("log", get_log))
