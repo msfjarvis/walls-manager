@@ -107,15 +107,14 @@ def get_random_file(bot: Bot, update: Update):
 @restricted
 def populate_cache(bot: Bot, update: Update, args: List[str]):
     max_cnt = 50
-    if len(args) >= 1 and args[0].isnumeric():
+    if len(args) == 1 and args[0].isnumeric():
         max_cnt = int(args[0])
     idx = 0
     all_files = list_all_files(LOCAL_DIR)
     update.message.reply_text(
         f"Database currently has {database.totalkeys()} keys. Caching {max_cnt} more..."
     )
-    for i in range(database.totalkeys() - 1, len(all_files)):
-        file = all_files[i]
+    for file in all_files:
         if idx == max_cnt:
             break
         file_hash = md5(file)
