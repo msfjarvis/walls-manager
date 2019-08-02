@@ -1,5 +1,9 @@
 # walls-manager [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 
+## DEPRECATED
+
+The sync script is feature-complete and the bot part has been replaced by [walls-bot](https://github.com/msfjarvis/walls-bot).
+
 Tooling used to maintain my public collection of desktop walls
 
 ## Usage
